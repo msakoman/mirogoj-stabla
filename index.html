@@ -148,8 +148,9 @@
             line-height: 1; padding: 0;
         }
         .remove-img-btn:hover { background: #b91c1c; }
-        #upload-progress-bar { height: 5px; border-radius: 3px; overflow: hidden; background: #e9ecef; }
-        #upload-progress { height: 100%; background: #143058; transition: width 0.2s; border-radius: 3px; }
+        /* ---- FOTO SLOT ---- */
+        .photo-slot { background: #f8f9fa; border: 1px dashed #dee2e6; border-radius: 6px; padding: 8px 10px; }
+        .photo-slot .img-preview-wrap img { max-height: 110px; }
 
         /* ---- SETUP BANNER ---- */
         #setup-banner {
@@ -412,7 +413,7 @@ service firebase.storage {
                         </div></div>
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Sječkalica" id="m4" name="mech">
-                            <label class="form-check-label small" for="m4">ښ�️ Sječkalica</label>
+                            <label class="form-check-label small" for="m4">⚙️ Sječkalica</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Kamion/prikolica" id="m5" name="mech">
@@ -431,27 +432,56 @@ service firebase.storage {
                     <textarea class="form-control form-control-sm" id="tree-notes" rows="2" placeholder="Npr. lokacija u blizini kapelice, opasno nagnut..."></textarea>
                 </div>
 
-                <!-- Fotografija -->
+                <!-- Fotografije (max 3) -->
                 <div class="mb-1">
                     <label class="form-label small fw-bold">
-                        <i class="bi bi-camera me-1"></i>Fotografija <span class="fw-normal text-muted">(max 2 MB, opcionalno)</span>
+                        <i class="bi bi-camera me-1"></i>Fotografije <span class="fw-normal text-muted">(max 3 × 2 MB, opcionalno)</span>
                     </label>
-                    <!-- Preview postojeće ili nove slike -->
-                    <div id="photo-preview-wrap" style="display:none; margin-bottom:8px;">
-                        <div class="img-preview-wrap">
-                            <img id="photo-preview" src="" alt="Fotografija stabla">
-                            <button type="button" class="remove-img-btn" onclick="removePhoto()" title="Ukloni fotografiju">×</button>
+                    <!-- Slot 1 -->
+                    <div class="photo-slot mb-2">
+                        <div class="small text-muted mb-1">📷 Slika 1 – Početno stanje</div>
+                        <div id="photo-preview-wrap-1" style="display:none;margin-bottom:6px;">
+                            <div class="img-preview-wrap">
+                                <img id="photo-preview-1" src="" alt="Slika 1">
+                                <button type="button" class="remove-img-btn" onclick="removePhoto(1)" title="Ukloni">×</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="tree-photo-url-1">
+                        <input type="file" class="form-control form-control-sm" id="tree-photo-file-1" accept="image/*">
+                        <div id="upload-progress-bar-1" style="display:none;margin-top:4px;height:4px;background:#e9ecef;border-radius:2px;">
+                            <div id="upload-progress-1" style="width:0%;height:100%;background:#143058;border-radius:2px;transition:width 0.2s;"></div>
                         </div>
                     </div>
-                    <!-- Gumb za upload -->
-                    <div id="photo-upload-area">
-                        <input type="file" class="form-control form-control-sm" id="tree-photo-file" accept="image/*">
+                    <!-- Slot 2 -->
+                    <div class="photo-slot mb-2">
+                        <div class="small text-muted mb-1">📷 Slika 2 – Tijek radova</div>
+                        <div id="photo-preview-wrap-2" style="display:none;margin-bottom:6px;">
+                            <div class="img-preview-wrap">
+                                <img id="photo-preview-2" src="" alt="Slika 2">
+                                <button type="button" class="remove-img-btn" onclick="removePhoto(2)" title="Ukloni">×</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="tree-photo-url-2">
+                        <input type="file" class="form-control form-control-sm" id="tree-photo-file-2" accept="image/*">
+                        <div id="upload-progress-bar-2" style="display:none;margin-top:4px;height:4px;background:#e9ecef;border-radius:2px;">
+                            <div id="upload-progress-2" style="width:0%;height:100%;background:#143058;border-radius:2px;transition:width 0.2s;"></div>
+                        </div>
                     </div>
-                    <!-- Progress bar -->
-                    <div id="upload-progress-bar" style="display:none; margin-top:6px;">
-                        <div id="upload-progress" style="width:0%;"></div>
+                    <!-- Slot 3 -->
+                    <div class="photo-slot">
+                        <div class="small text-muted mb-1">📷 Slika 3 – Nakon uklanjanja</div>
+                        <div id="photo-preview-wrap-3" style="display:none;margin-bottom:6px;">
+                            <div class="img-preview-wrap">
+                                <img id="photo-preview-3" src="" alt="Slika 3">
+                                <button type="button" class="remove-img-btn" onclick="removePhoto(3)" title="Ukloni">×</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="tree-photo-url-3">
+                        <input type="file" class="form-control form-control-sm" id="tree-photo-file-3" accept="image/*">
+                        <div id="upload-progress-bar-3" style="display:none;margin-top:4px;height:4px;background:#e9ecef;border-radius:2px;">
+                            <div id="upload-progress-3" style="width:0%;height:100%;background:#143058;border-radius:2px;transition:width 0.2s;"></div>
+                        </div>
                     </div>
-                    <div id="upload-status" class="small text-muted mt-1" style="display:none;"></div>
                 </div>
             </div>
 
@@ -531,21 +561,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') doLogin(auth);
     });
 
-    // Preview slike pri odabiru
-    document.getElementById('tree-photo-file').addEventListener('change', function() {
-        const file = this.files[0];
-        if (!file) return;
-        if (file.size > MAX_PHOTO_BYTES) {
-            alert('Fotografija je prevelika. Maksimalna veličina je 2 MB.');
-            this.value = '';
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('photo-preview').src = e.target.result;
-            document.getElementById('photo-preview-wrap').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+    // Preview slike pri odabiru (sva 3 slota)
+    [1, 2, 3].forEach(idx => {
+        document.getElementById(`tree-photo-file-${idx}`).addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            if (file.size > MAX_PHOTO_BYTES) {
+                alert(`Slika ${idx} je prevelika. Maksimalna veličina je 2 MB.`);
+                this.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById(`photo-preview-${idx}`).src = e.target.result;
+                document.getElementById(`photo-preview-wrap-${idx}`).style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
     });
 
     // Auth listener
@@ -628,7 +660,7 @@ function listenToTrees(db) {
 // MARKERI
 // =====================================================================
 function getColor(status) {
-    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6b7280';
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6f7280';
 }
 
 function addMarker(data, db) {
@@ -666,9 +698,16 @@ function refreshMarkerListeners(db) {
 function showInfo(data, marker) {
     const mach  = data.machinery?.length ? data.machinery.join(', ') : '–';
     const stars = '★'.repeat(data.complexity || 1) + '☆'.repeat(5 - (data.complexity || 1));
-    const photoHtml = data.photoUrl
-        ? `<div style="margin-bottom:8px;">
-               <img src="${data.photoUrl}" alt="Fotografija" style="max-width:100%;max-height:200px;border-radius:7px;border:1px solid #dee2e6;cursor:pointer;" onclick="window.open('${data.photoUrl}','_blank')">
+    const photoLabels = ['Početno stanje', 'Tijek radova', 'Nakon uklanjanja'];
+    const photos = [data.photoUrl, data.photoUrl2, data.photoUrl3].filter(Boolean);
+    const photoHtml = photos.length
+        ? `<div style="display:flex;gap:5px;margin-bottom:8px;overflow-x:auto;padding-bottom:2px;">
+            ${photos.map((url, i) => `<div style="flex-shrink:0;text-align:center;">
+                <img src="${url}" alt="Slika ${i+1}"
+                    style="height:85px;width:85px;object-fit:cover;border-radius:6px;border:1px solid #dee2e6;cursor:pointer;display:block;"
+                    onclick="window.open('${url}','_blank')">
+                <div style="font-size:0.62rem;color:#888;margin-top:2px;">${photoLabels[i]}</div>
+            </div>`).join('')}
            </div>`
         : '';
     infoWindow.setContent(`
@@ -703,70 +742,50 @@ async function saveTree() {
     const status     = document.querySelector('input[name="st"]:checked').value;
     const notes      = document.getElementById('tree-notes').value.trim();
     const machinery  = [...document.querySelectorAll('input[name="mech"]:checked')].map(c => c.value);
-    const fileInput  = document.getElementById('tree-photo-file');
-    const file       = fileInput.files[0];
-    let   photoUrl   = document.getElementById('tree-photo-url').value;
-
-    if (file && file.size > MAX_PHOTO_BYTES) {
-        alert('Fotografija je prevelika. Maksimalna veličina je 2 MB.');
-        return;
-    }
 
     const saveBtn = document.getElementById('save-btn');
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sprema...';
 
     try {
-        // Upload fotografije ako je odabrana nova
-        if (file) {
-            const ext     = file.name.split('.').pop().toLowerCase() || 'jpg';
-            // Koristimo privremeni ID za novo stablo, pravi ID za edit
-            const docId   = id || db.collection('trees').doc().id;
-            const path    = `trees/${docId}.${ext}`;
-            const ref     = storage.ref(path);
+        const docId = id || db.collection('trees').doc().id;
+        // Suffixes za Storage: slot 1 = '', slot 2 = '-2', slot 3 = '-3'
+        const suffixes = ['', '-2', '-3'];
+        const photoUrls = [];
 
-            // Progress bar
-            const progressWrap = document.getElementById('upload-progress-bar');
-            const progressBar  = document.getElementById('upload-progress');
-            const statusEl     = document.getElementById('upload-status');
-            progressWrap.style.display = 'block';
-            statusEl.style.display = 'block';
-            statusEl.textContent = 'Uploading fotografiju...';
+        for (let i = 0; i < 3; i++) {
+            const idx  = i + 1;
+            const file = document.getElementById(`tree-photo-file-${idx}`).files[0];
+            const existing = document.getElementById(`tree-photo-url-${idx}`).value;
 
-            const uploadTask = ref.put(file, { contentType: file.type });
-            await new Promise((resolve, reject) => {
-                uploadTask.on('state_changed',
-                    snap => {
-                        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-                        progressBar.style.width = pct + '%';
-                        statusEl.textContent = `Upload: ${pct}%`;
-                    },
-                    reject,
-                    resolve
-                );
-            });
+            if (file) {
+                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+                const path = `trees/${docId}${suffixes[i]}.${ext}`;
+                const ref  = storage.ref(path);
+                const progressWrap = document.getElementById(`upload-progress-bar-${idx}`);
+                const progressBar  = document.getElementById(`upload-progress-${idx}`);
+                progressWrap.style.display = 'block';
 
-            photoUrl = await ref.getDownloadURL();
-            progressWrap.style.display = 'none';
-            statusEl.style.display = 'none';
-
-            // Ako je novo stablo, spremi ga s poznatim ID-em
-            if (!id) {
-                const payload = {
-                    lat, lng, complexity, status, notes, machinery,
-                    photoUrl,
-                    dateAdded:    firebase.firestore.FieldValue.serverTimestamp(),
-                    dateModified: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                await db.collection('trees').doc(docId).set(payload);
-                treeModalBS.hide();
-                return;
+                const uploadTask = ref.put(file, { contentType: file.type });
+                await new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed',
+                        snap => { progressBar.style.width = Math.round((snap.bytesTransferred / snap.totalBytes) * 100) + '%'; },
+                        reject, resolve
+                    );
+                });
+                photoUrls.push(await ref.getDownloadURL());
+                progressWrap.style.display = 'none';
+                progressBar.style.width = '0%';
+            } else {
+                photoUrls.push(existing || null);
             }
         }
 
         const payload = {
             lat, lng, complexity, status, notes, machinery,
-            photoUrl: photoUrl || null,
+            photoUrl:  photoUrls[0] || null,
+            photoUrl2: photoUrls[1] || null,
+            photoUrl3: photoUrls[2] || null,
             dateModified: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -774,7 +793,7 @@ async function saveTree() {
             await db.collection('trees').doc(id).update(payload);
         } else {
             payload.dateAdded = firebase.firestore.FieldValue.serverTimestamp();
-            await db.collection('trees').add(payload);
+            await db.collection('trees').doc(docId).set(payload);
         }
         treeModalBS.hide();
     } catch (e) {
@@ -789,12 +808,10 @@ async function deleteTree() {
     const id = document.getElementById('tree-id').value;
     if (!id || !confirm('Obriši ovo stablo?')) return;
     try {
-        // Pokušaj obrisati i fotografiju iz Storage-a (ako postoji)
-        const photoUrl = document.getElementById('tree-photo-url').value;
-        if (photoUrl) {
-            try {
-                await firebase.storage().refFromURL(photoUrl).delete();
-            } catch (_) { /* fotografija možda ne postoji, nastavi */ }
+        // Pokušaj obrisati sve fotografije iz Storage-a
+        const urls = [1, 2, 3].map(i => document.getElementById(`tree-photo-url-${i}`).value).filter(Boolean);
+        for (const url of urls) {
+            try { await firebase.storage().refFromURL(url).delete(); } catch (_) {}
         }
         await firebase.firestore().collection('trees').doc(id).delete();
         treeModalBS.hide();
@@ -805,26 +822,29 @@ async function deleteTree() {
 // MODALNI PROZORI
 // =====================================================================
 function resetPhotoUI() {
-    document.getElementById('tree-photo-file').value = '';
-    document.getElementById('tree-photo-url').value  = '';
-    document.getElementById('photo-preview-wrap').style.display = 'none';
-    document.getElementById('upload-progress-bar').style.display = 'none';
-    document.getElementById('upload-status').style.display = 'none';
-    document.getElementById('upload-progress').style.width = '0%';
+    [1, 2, 3].forEach(idx => {
+        document.getElementById(`tree-photo-file-${idx}`).value = '';
+        document.getElementById(`tree-photo-url-${idx}`).value  = '';
+        document.getElementById(`photo-preview-wrap-${idx}`).style.display = 'none';
+        document.getElementById(`upload-progress-bar-${idx}`).style.display = 'none';
+        document.getElementById(`upload-progress-${idx}`).style.width = '0%';
+    });
 }
 
-function showPhotoPreview(url) {
+function showPhotoPreview(url, idx) {
     if (url) {
-        document.getElementById('photo-preview').src = url;
-        document.getElementById('photo-preview-wrap').style.display = 'block';
+        document.getElementById(`photo-preview-${idx}`).src = url;
+        document.getElementById(`photo-preview-wrap-${idx}`).style.display = 'block';
     } else {
-        document.getElementById('photo-preview-wrap').style.display = 'none';
+        document.getElementById(`photo-preview-wrap-${idx}`).style.display = 'none';
     }
-    document.getElementById('tree-photo-url').value = url || '';
+    document.getElementById(`tree-photo-url-${idx}`).value = url || '';
 }
 
-function removePhoto() {
-    resetPhotoUI();
+function removePhoto(idx) {
+    document.getElementById(`tree-photo-file-${idx}`).value = '';
+    document.getElementById(`tree-photo-url-${idx}`).value  = '';
+    document.getElementById(`photo-preview-wrap-${idx}`).style.display = 'none';
 }
 
 function openAddModal(lat, lng) {
@@ -856,9 +876,11 @@ function openEditModal(data, db) {
     });
     setComplexity(data.complexity || 1);
 
-    // Fotografija
+    // Fotografije (backwards compatible)
     resetPhotoUI();
-    showPhotoPreview(data.photoUrl || null);
+    showPhotoPreview(data.photoUrl  || null, 1);
+    showPhotoPreview(data.photoUrl2 || null, 2);
+    showPhotoPreview(data.photoUrl3 || null, 3);
 
     treeModalBS.show();
 }
@@ -885,7 +907,7 @@ async function doLogin(auth) {
     try {
         await auth.signInWithEmailAndPassword(email, pass);
         loginModalBS.hide();
-        } catch (e) {
+    } catch (e) {
         err.textContent = 'Pogrešan email ili lozinka.';
         err.classList.remove('d-none');
     }
@@ -927,9 +949,10 @@ function renderPanel() {
     list.innerHTML = trees.map(t => {
         const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : 'sa';
         const mach  = t.machinery?.length ? t.machinery.join(', ') : '';
-        const stars = '★'.repeat(t.complexity||1) + '★'.repeat(5-(t.complexity||1));
-        const thumb = t.photoUrl
-            ? `<img src="${t.photoUrl}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #eee;flex-shrink:0;">`
+        const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
+        const firstPhoto = t.photoUrl || t.photoUrl2 || t.photoUrl3;
+        const thumb = firstPhoto
+            ? `<img src="${firstPhoto}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #eee;flex-shrink:0;">`
             : '';
         return `<div class="tree-item" onclick="focusTree('${t.id}')">
             <div class="d-flex justify-content-between align-items-start gap-2">
@@ -980,11 +1003,11 @@ function setComplexity(v) {
 }
 
 // =====================================================================
-// IZVOZ CSV
+// IVVOZ CSV
 // =====================================================================
 function exportCSV() {
     if (!allTrees.length) { alert('Nema podataka za izvoz.'); return; }
-    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Fotografija URL','Datum evidencije','Datum izmjene'];
+    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Slika 1 (početno)','Slika 2 (tijek)','Slika 3 (završno)','Datum evidencije','Datum izmjene'];
     const rows = allTrees.map(t => [
         t.id,
         t.lat.toFixed(7),
@@ -993,7 +1016,9 @@ function exportCSV() {
         t.complexity || '',
         (t.machinery?.length ? '"' + t.machinery.join('; ') + '"' : ''),
         (t.notes ? '"' + t.notes.replace(/"/g,'""') + '"' : ''),
-        t.photoUrl || '',
+        t.photoUrl  || '',
+        t.photoUrl2 || '',
+        t.photoUrl3 || '',
         fmtDate(t.dateAdded),
         t.dateModified ? fmtDate(t.dateModified) : ''
     ]);
@@ -1006,10 +1031,10 @@ function exportCSV() {
 }
 
 // =====================================================================
-// POMOćNE FUNKCIJE
+// POMOĆNE FUNKCIJE
 // =====================================================================
 function fmtDate(ts) {
-    if (!ts) return '┌';
+    if (!ts) return '–';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
     return d.toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
