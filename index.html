@@ -506,7 +506,7 @@ let isLoggedIn = false;
 let currentFilter = 'all';
 let treeModalBS, loginModalBS;
 
-const MIROGOJ = { lat: 45.8282, lng: 16.0097 };
+const MIROGOJ = { lat: 45.835926, lng: 15.984933 };
 const COMPLEXITY_LABELS = ['','Jednostavno','Lagano','Srednje','Zahtjevno','Vrlo zahtjevno'];
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
 
@@ -628,7 +628,7 @@ function listenToTrees(db) {
 // MARKERI
 // =====================================================================
 function getColor(status) {
-    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6b7280';
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6f7280';
 }
 
 function addMarker(data, db) {
@@ -672,7 +672,7 @@ function showInfo(data, marker) {
            </div>`
         : '';
     infoWindow.setContent(`
-        <div style="font-family:'Segoe UI%,sans-serif;min-width:240px;padding:4px 2px;">
+        <div style="font-family:'Segoe UI',sans-serif;min-width:240px;padding:4px 2px;">
             ${photoHtml}
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
                 <strong>#${data.id.slice(-4).toUpperCase()}</strong>
@@ -885,7 +885,7 @@ async function doLogin(auth) {
     try {
         await auth.signInWithEmailAndPassword(email, pass);
         loginModalBS.hide();
-    } catch (e) {
+        } catch (e) {
         err.textContent = 'Pogrešan email ili lozinka.';
         err.classList.remove('d-none');
     }
@@ -927,7 +927,7 @@ function renderPanel() {
     list.innerHTML = trees.map(t => {
         const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : 'sa';
         const mach  = t.machinery?.length ? t.machinery.join(', ') : '';
-        const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
+        const stars = '★'.repeat(t.complexity||1) + '★'.repeat(5-(t.complexity||1));
         const thumb = t.photoUrl
             ? `<img src="${t.photoUrl}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #eee;flex-shrink:0;">`
             : '';
@@ -1002,14 +1002,14 @@ function exportCSV() {
         href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })),
         download: `mirogoj_stabla_${new Date().toISOString().slice(0,10)}.csv`
     });
-    a.click(); URL.revokeObjectURL(a.href);
+    a.click(); URL.revokeObjectURL(a{href);
 }
 
 // =====================================================================
-// POMOĆNE FUNKCIJE
+// POMOćNE FUNKCIJE
 // =====================================================================
 function fmtDate(ts) {
-    if (!ts) return '–';
+    if (!ts) return '┌';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
     return d.toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
