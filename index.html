@@ -628,7 +628,7 @@ function listenToTrees(db) {
 // MARKERI
 // =====================================================================
 function getColor(status) {
-    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6f7280';
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6b7280';
 }
 
 function addMarker(data, db) {
@@ -1002,7 +1002,7 @@ function exportCSV() {
         href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })),
         download: `mirogoj_stabla_${new Date().toISOString().slice(0,10)}.csv`
     });
-    a.click(); URL.revokeObjectURL(a{href);
+    a.click(); URL.revokeObjectURL(a.href);
 }
 
 // =====================================================================
