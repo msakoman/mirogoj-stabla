@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Evidencija srušenih stabala – Mirogoj</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        /* ---- MAP ---- */
+        #map { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+        /* ---- NAVBAR ---- */
+        #navbar {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 1100;
+            background: rgba(20, 48, 88, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 9px 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+        }
+        #navbar .logo { color: #fff; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 9px; }
+        #navbar .logo i { color: #4ade80; font-size: 1.35rem; }
+        .nav-actions { display: flex; gap: 7px; align-items: center; }
+
+        /* ---- STATS BAR ---- */
+        #stats-bar {
+            position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+            z-index: 1050; display: flex; gap: 6px;
+            background: rgba(255,255,255,0.97); border-radius: 30px;
+            padding: 5px 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            white-space: nowrap;
+        }
+        .stat-pill {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.8rem; font-weight: 600; padding: 3px 10px; border-radius: 14px;
+        }
+        .stat-pill.ev { background: #fee2e2; color: #dc2626; }
+        .stat-pill.up { background: #fef3c7; color: #b45309; }
+        .stat-pill.sa { background: #dcfce7; color: #15803d; }
+
+        /* ---- FILTER BAR (left) ---- */
+        #filter-bar {
+            position: absolute; top: 56px; left: 10px; z-index: 1050;
+            display: flex; flex-direction: column; gap: 5px; padding-top: 4px;
+        }
+        .filter-btn {
+            background: rgba(255,255,255,0.96); border: 2px solid transparent;
+            border-radius: 8px; padding: 5px 11px; cursor: pointer;
+            font-size: 0.78rem; font-weight: 600; box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+            display: flex; align-items: center; gap: 5px; transition: all 0.18s;
+            color: #333;
+        }
+        .filter-btn.active { border-color: #143058; background: #e8eef7; }
+        .filter-btn:hover { background: #f0f0f0; }
+
+        /* ---- PANEL TOGGLE ---- */
+        #panel-toggle {
+            position: absolute; top: 56px; right: 10px; z-index: 1051;
+            background: rgba(255,255,255,0.96); border: none; border-radius: 9px;
+            padding: 9px 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer; font-size: 0.83rem; color: #143058; font-weight: 600;
+            display: flex; align-items: center; gap: 6px; transition: background 0.15s;
+        }
+        #panel-toggle:hover { background: #e8eef7; }
+
+        /* ---- SIDE PANEL ---- */
+        #side-panel {
+            position: absolute; top: 56px; right: -370px; bottom: 0; width: 360px;
+            z-index: 1050; background: #fff; box-shadow: -4px 0 22px rgba(0,0,0,0.14);
+            transition: right 0.28s cubic-bezier(.4,0,.2,1);
+            display: flex; flex-direction: column;
+        }
+        #side-panel.open { right: 0; }
+        #panel-header {
+            background: #143058; color: #fff; padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        #panel-list { flex: 1; overflow-y: auto; }
+        #panel-list::-webkit-scrollbar { width: 4px; }
+        #panel-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+        .tree-item {
+            padding: 11px 14px; border-bottom: 1px solid #f0f0f0;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .tree-item:hover { background: #f7f9fc; }
+        .tree-id-label { font-size: 0.72rem; color: #999; }
+
+        /* ---- STATUS BADGES ---- */
+        .badge-ev { background: #fee2e2; color: #dc2626; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+        .badge-up { background: #fef3c7; color: #b45309; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+        .badge-sa { background: #dcfce7; color: #15803d; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+
+        /* ---- MODE INDICATOR ---- */
+        #mode-indicator {
+            position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+            z-index: 1050; background: #143058; color: #fff;
+            padding: 9px 22px; border-radius: 30px; font-size: 0.88rem;
+            display: none; align-items: center; gap: 8px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.3);
+            animation: modePulse 2.5s ease-in-out infinite;
+        }
+        @keyframes modePulse { 0%,100% { opacity:1; } 50% { opacity:0.75; } }
+
+        /* ---- STATUS RADIO BUTTONS ---- */
+        .status-option { display: inline-flex; cursor: pointer; }
+        .status-option input[type="radio"] { display: none; }
+        .status-label {
+            padding: 5px 14px; border-radius: 20px; cursor: pointer;
+            font-weight: 600; font-size: 0.83rem;
+            border: 2px solid transparent; transition: all 0.15s; user-select: none;
+        }
+        .ev-label { background: #fee2e2; color: #dc2626; }
+        .up-label { background: #fef3c7; color: #b45309; }
+        .sa-label { background: #dcfce7; color: #15803d; }
+        .status-option input:checked + .status-label { border-color: currentColor; box-shadow: 0 0 0 2px rgba(0,0,0,0.08); }
+
+        /* ---- STAR RATING ---- */
+        .star-row { display: flex; gap: 2px; }
+        .star-row span {
+            font-size: 1.55rem; cursor: pointer; color: #d1d5db; line-height: 1;
+            transition: color 0.1s, transform 0.1s;
+        }
+        .star-row span:hover { transform: scale(1.15); }
+        .star-row span.lit { color: #f59e0b; }
+
+        /* ---- SETUP BANNER ---- */
+        #setup-banner {
+            position: absolute; inset: 0; z-index: 9999;
+            background: rgba(10,20,40,0.92); display: flex;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        #setup-banner .card { max-width: 600px; width: 100%; }
+        .setup-step { counter-increment: step; display: flex; gap: 12px; margin-bottom: 12px; }
+        .setup-step::before {
+            content: counter(step); background: #143058; color: #fff;
+            border-radius: 50%; min-width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+        }
+        .setup-steps { counter-reset: step; }
+        code { background: #f0f4f8; padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; color: #143058; }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 600px) {
+            #side-panel { width: 100%; right: -100%; }
+            #navbar .logo .logo-text { display: none; }
+            #stats-bar { font-size: 0.7rem; padding: 4px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===================== SETUP BANNER (hidden when configured) ===================== -->
+<div id="setup-banner" style="display:none;">
+    <div class="card shadow-lg">
+        <div class="card-header" style="background:#143058; color:#fff;">
+            <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Postavljanje aplikacije – jednokratno</h5>
+        </div>
+        <div class="card-body" style="max-height:80vh; overflow-y:auto;">
+            <p class="text-muted mb-3" style="font-size:0.88rem;">
+                Ova aplikacija koristi <strong>Firebase</strong> za bazu podataka i <strong>Google Maps</strong> za kartu.
+                Obje usluge imaju besplatni tier koji je dovoljan za ovaj projekt.
+            </p>
+
+            <h6 class="fw-bold mb-2">🔥 Korak 1 – Firebase</h6>
+            <div class="setup-steps mb-3" style="font-size:0.85rem;">
+                <div class="setup-step">Idi na <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> i klikni <strong>Add project</strong>. Imenuj projekt (npr. <em>mirogoj-stabla</em>).</div>
+                <div class="setup-step">U izborniku lijevo → <strong>Build → Authentication</strong> → <em>Get started</em> → <strong>Email/Password</strong> → Enable → Save.</div>
+                <div class="setup-step">Authentication → <strong>Users</strong> → <em>Add user</em>: upiši email i lozinku za prijavu u aplikaciju.</div>
+                <div class="setup-step"><strong>Build → Firestore Database</strong> → <em>Create database</em> → <em>Start in production mode</em> → odaberi europe-west3 (Frankfurt).</div>
+                <div class="setup-step">Firestore → <strong>Rules</strong> → zamijeni sve s kodom ispod → Publish:
+                    <pre class="mt-1 p-2 rounded" style="background:#f8f9fa; font-size:0.75rem; overflow-x:auto;">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /trees/{treeId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}</pre>
+                </div>
+                <div class="setup-step">Project Settings (zupčanik gore lijevo) → <em>Your apps</em> → <strong>&lt;/&gt;</strong> (Web) → Registriraj app → kopiraj <code>firebaseConfig</code> objekt.</div>
+            </div>
+
+            <h6 class="fw-bold mb-2">🗺️ Korak 2 – Google Maps API ključ</h6>
+            <div class="setup-steps mb-3" style="font-size:0.85rem;">
+                <div class="setup-step">Idi na <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → odaberi isti projekt ili kreiraj novi.</div>
+                <div class="setup-step"><strong>APIs &amp; Services → Library</strong> → traži <em>"Maps JavaScript API"</em> → Enable.</div>
+                <div class="setup-step"><strong>APIs &amp; Services → Credentials → Create Credentials → API key</strong>. Kopiraj ključ.</div>
+            </div>
+
+            <h6 class="fw-bold mb-2">⚙️ Korak 3 – Unesi ključeve u aplikaciju</h6>
+            <p style="font-size:0.85rem;">
+                Otvori <code>index.html</code> u tekst editoru, pronađi sekciju <code>// ===== KONFIGURACIJA =====</code>
+                i zamijeni placeholder vrijednosti s pravim ključevima.
+            </p>
+
+            <button class="btn btn-primary w-100 mt-2" onclick="document.getElementById('setup-banner').style.display='none'">
+                Već sam postavio ključeve – zatvori ovo
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== NAVBAR ===================== -->
+<div id="navbar">
+    <div class="logo">
+        <i class="bi bi-tree-fill"></i>
+        <span class="logo-text">Evidencija srušenih stabala – Mirogoj</span>
+    </div>
+    <div class="nav-actions">
+        <button class="btn btn-sm btn-outline-light" onclick="exportCSV()" title="Izvoz podataka u CSV">
+            <i class="bi bi-download me-1"></i><span class="d-none d-sm-inline">Izvoz CSV</span>
+        </button>
+        <button class="btn btn-sm" id="login-btn" onclick="handleLoginBtn()">
+            <i class="bi bi-person-lock me-1"></i><span id="login-label">Prijava</span>
+        </button>
+    </div>
+</div>
+
+<!-- ===================== STATS BAR ===================== -->
+<div id="stats-bar">
+    <div class="stat-pill ev"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-ev">0</span> Evidentirano</div>
+    <div class="stat-pill up"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-up">0</span> U postupku</div>
+    <div class="stat-pill sa"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-sa">0</span> Sanirano</div>
+</div>
+
+<!-- ===================== FILTER BAR ===================== -->
+<div id="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all',this)"><i class="bi bi-layers"></i> Sve</button>
+    <button class="filter-btn" onclick="setFilter('evidentirano',this)"><span style="color:#dc2626">●</span> Evidentirano</button>
+    <button class="filter-btn" onclick="setFilter('u postupku',this)"><span style="color:#b45309">●</span> U postupku</button>
+    <button class="filter-btn" onclick="setFilter('sanirano',this)"><span style="color:#15803d">●</span> Sanirano</button>
+</div>
+
+<!-- ===================== MAP ===================== -->
+<div id="map"></div>
+
+<!-- ===================== PANEL TOGGLE ===================== -->
+<button id="panel-toggle" onclick="togglePanel()">
+    <i class="bi bi-list-ul"></i> Popis stabala
+</button>
+
+<!-- ===================== SIDE PANEL ===================== -->
+<div id="side-panel">
+    <div id="panel-header">
+        <span><i class="bi bi-list-ul me-2"></i>Popis stabala</span>
+        <button class="btn btn-sm btn-outline-light py-0 px-2" onclick="togglePanel()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="px-2 py-2" style="border-bottom:1px solid #eee; background:#f8f9fa; flex-shrink:0;">
+        <select class="form-select form-select-sm" id="panel-filter" onchange="renderPanel()">
+            <option value="all">Sve</option>
+            <option value="evidentirano">Evidentirano</option>
+            <option value="u postupku">U postupku</option>
+            <option value="sanirano">Sanirano</option>
+        </select>
+    </div>
+    <div id="panel-list"></div>
+</div>
+
+<!-- ===================== MODE INDICATOR ===================== -->
+<div id="mode-indicator">
+    <i class="bi bi-cursor-fill"></i> Klikni na kartu za dodavanje stabla
+</div>
+
+<!-- ===================== LOGIN MODAL ===================== -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center px-4 pb-4">
+                <i class="bi bi-shield-lock" style="font-size:2.6rem; color:#143058;"></i>
+                <h5 class="mt-2 mb-4 fw-bold">Prijava</h5>
+                <div id="login-err" class="alert alert-danger d-none py-2 small"></div>
+                <div class="mb-3 text-start">
+                    <label class="form-label small fw-semibold">Email adresa</label>
+                    <input type="email" class="form-control" id="inp-email" autocomplete="username" placeholder="admin@example.com">
+                </div>
+                <div class="mb-4 text-start">
+                    <label class="form-label small fw-semibold">Lozinka</label>
+                    <input type="password" class="form-control" id="inp-pass" autocomplete="current-password" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary w-100 fw-semibold" onclick="doLogin()">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Prijavi se
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== ADD / EDIT TREE MODAL ===================== -->
+<div class="modal fade" id="treeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header py-3" style="background:#143058; color:#fff;">
+                <h5 class="modal-title mb-0">
+                    <i class="bi bi-tree-fill me-2"></i><span id="modal-title">Novo srušeno stablo</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <input type="hidden" id="tree-id">
+
+                <!-- Geolokacija -->
+                <div class="mb-3">
+                    <label class="form-label small text-muted fw-semibold">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>Geolokacija (automatski s karte)
+                    </label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light">Lat</span>
+                        <input type="text" class="form-control font-monospace" id="tree-lat" readonly>
+                        <span class="input-group-text bg-light">Lng</span>
+                        <input type="text" class="form-control font-monospace" id="tree-lng" readonly>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Status sanacije</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <label class="status-option">
+                            <input type="radio" name="st" value="evidentirano" checked>
+                            <span class="status-label ev-label">● Evidentirano</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="st" value="u postupku">
+                            <span class="status-label up-label">● U postupku</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="st" value="sanirano">
+                            <span class="status-label sa-label">● Sanirano</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Kompleksnost -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Kompleksnost sanacije</label>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="star-row" id="star-row">
+                            <span onclick="setComplexity(1)">★</span>
+                            <span onclick="setComplexity(2)">★</span>
+                            <span onclick="setComplexity(3)">★</span>
+                            <span onclick="setComplexity(4)">★</span>
+                            <span onclick="setComplexity(5)">★</span>
+                        </div>
+                        <span id="complexity-lbl" class="text-muted small"></span>
+                    </div>
+                    <input type="hidden" id="tree-complexity" value="1">
+                </div>
+
+                <!-- Mehanizacija -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Potrebna mehanizacija</label>
+                    <div class="row g-2">
+                        <div class="col-6"><div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Motorna pila" id="m1" name="mech">
+                            <label class="form-check-label small" for="m1">🪚 Motorna pila</label>
+                        </div></div>
+                        <div class="col-6"><div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Utovarivač" id="m2" name="mech">
+                            <label class="form-check-label small" for="m2">🚛 Utovarivač</label>
+                        </div></div>
+                        <div class="col-6"><div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Dizalica/kran" id="m3" name="mech">
+                            <label class="form-check-label small" for="m3">🏗️ Dizalica/kran</label>
+                        </div></div>
+                        <div class="col-6"><div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sječkalica" id="m4" name="mech">
+                            <label class="form-check-label small" for="m4">⚙️ Sječkalica</label>
+                        </div></div>
+                        <div class="col-6"><div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Kamion/prikolica" id="m5" name="mech">
+                            <label class="form-check-label small" for="m5">🚚 Kamion/prikolica</label>
+                        </div></div>
+                        <div class="col-6"><div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Samo ručni rad" id="m6" name="mech">
+                            <label class="form-check-label small" for="m6">👷 Samo ručni rad</label>
+                        </div></div>
+                    </div>
+                </div>
+
+                <!-- Napomene -->
+                <div class="mb-1">
+                    <label class="form-label small fw-bold">Napomene <span class="fw-normal text-muted">(opcionalno)</span></label>
+                    <textarea class="form-control form-control-sm" id="tree-notes" rows="2" placeholder="Npr. lokacija u blizini kapelice, opasno nagnut..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer py-2">
+                <button class="btn btn-sm btn-outline-danger me-auto" id="del-btn" onclick="deleteTree()" style="display:none;">
+                    <i class="bi bi-trash me-1"></i>Obriši
+                </button>
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Odustani</button>
+                <button class="btn btn-sm btn-primary fw-semibold px-4" onclick="saveTree()">
+                    <i class="bi bi-check-lg me-1"></i>Spremi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* =====================================================================
+   ===== KONFIGURACIJA – ZAMIJENI OVE VRIJEDNOSTI =====
+   ===================================================================== */
+
+const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyDwqVmd-9UrT3Kg_6sCtNR6WWXwfZcv-Qg",
+    authDomain:        "mirogoj-stabla-3e079.firebaseapp.com",
+    projectId:         "mirogoj-stabla-3e079",
+    storageBucket:     "mirogoj-stabla-3e079.firebasestorage.app",
+    messagingSenderId: "851601836573",
+    appId:             "1:851601836573:web:9455b7ac376e5bea6194f4"
+};
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyDwqVmd-9UrT3Kg_6sCtNR6WWXwfZcv-Qg";
+
+/* ===================================================================== */
+
+// Provjera je li konfiguracija popunjena
+const IS_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('FIREBASE_'))
+                      && GOOGLE_MAPS_API_KEY !== "GOOGLE_MAPS_API_KEY";
+
+// ---- Globalno stanje ----
+let map, infoWindow;
+let markers    = {};   // id → { marker, data }
+let allTrees   = [];
+let isLoggedIn = false;
+let currentFilter = 'all';
+let treeModalBS, loginModalBS;
+
+const MIROGOJ = { lat: 45.8282, lng: 16.0097 };
+
+const COMPLEXITY_LABELS = ['','Jednostavno','Lagano','Srednje','Zahtjevno','Vrlo zahtjevno'];
+
+// =====================================================================
+// INICIJALIZACIJA
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    if (!IS_CONFIGURED) {
+        document.getElementById('setup-banner').style.display = 'flex';
+        return;
+    }
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    treeModalBS  = new bootstrap.Modal(document.getElementById('treeModal'));
+    loginModalBS = new bootstrap.Modal(document.getElementById('loginModal'));
+
+    // Enter u polju lozinke
+    document.getElementById('inp-pass').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doLogin(auth);
+    });
+
+    // Auth listener
+    auth.onAuthStateChanged(user => {
+        isLoggedIn = !!user;
+        const btn   = document.getElementById('login-btn');
+        const label = document.getElementById('login-label');
+        const ind   = document.getElementById('mode-indicator');
+
+        if (isLoggedIn) {
+            label.textContent = 'Odjava';
+            btn.className = 'btn btn-sm btn-success fw-semibold';
+            ind.style.display = 'flex';
+        } else {
+            label.textContent = 'Prijava';
+            btn.className = 'btn btn-sm btn-outline-light';
+            ind.style.display = 'none';
+        }
+        refreshMarkerListeners(db);
+    });
+
+    // Dinamički učitaj Google Maps
+    window._initMap = () => initMap(db, auth);
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=_initMap&loading=async&language=hr`;
+    s.async = true; s.defer = true;
+    document.head.appendChild(s);
+});
+
+// =====================================================================
+// KARTA
+// =====================================================================
+function initMap(db, auth) {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: MIROGOJ,
+        zoom: 17,
+        mapTypeId: 'hybrid',
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.BOTTOM_LEFT,
+            mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain']
+        },
+        streetViewControl: false,
+        fullscreenControl: true,
+        zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER }
+    });
+
+    infoWindow = new google.maps.InfoWindow();
+
+    map.addListener('click', e => {
+        if (isLoggedIn) openAddModal(e.latLng.lat(), e.latLng.lng());
+    });
+
+    listenToTrees(db);
+}
+
+// =====================================================================
+// FIRESTORE – real-time listener
+// =====================================================================
+function listenToTrees(db) {
+    db.collection('trees').orderBy('dateAdded', 'desc').onSnapshot(snap => {
+        // Ukloni stare markere
+        Object.values(markers).forEach(({ marker }) => marker.setMap(null));
+        markers = {};
+        allTrees = [];
+
+        snap.forEach(doc => {
+            const data = { id: doc.id, ...doc.data() };
+            allTrees.push(data);
+            addMarker(data, db);
+        });
+
+        applyFilter();
+        updateStats();
+        renderPanel();
+    }, err => console.error('Firestore:', err));
+}
+
+// =====================================================================
+// MARKERI
+// =====================================================================
+function getColor(status) {
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6b7280';
+}
+
+function addMarker(data, db) {
+    const color = getColor(data.status);
+    const marker = new google.maps.Marker({
+        position: { lat: data.lat, lng: data.lng },
+        map: map,
+        icon: {
+            path: 'M 0,-13 C -6.5,-13 -11,-8 -11,0 C -11,8 0,15 0,15 C 0,15 11,8 11,0 C 11,-8 6.5,-13 0,-13 Z',
+            fillColor: color, fillOpacity: 1,
+            strokeColor: '#fff', strokeWeight: 2,
+            scale: 1.15, anchor: new google.maps.Point(0, 15)
+        },
+        title: `#${data.id.slice(-4).toUpperCase()} – ${data.status}`
+    });
+
+    marker.addListener('click', () => {
+        if (isLoggedIn) openEditModal(data, db);
+        else showInfo(data, marker);
+    });
+
+    markers[data.id] = { marker, data };
+}
+
+function refreshMarkerListeners(db) {
+    Object.values(markers).forEach(({ marker, data }) => {
+        google.maps.event.clearListeners(marker, 'click');
+        marker.addListener('click', () => {
+            if (isLoggedIn) openEditModal(data, db);
+            else showInfo(data, marker);
+        });
+    });
+}
+
+function showInfo(data, marker) {
+    const mach = data.machinery?.length ? data.machinery.join(', ') : '–';
+    const stars = '★'.repeat(data.complexity || 1) + '☆'.repeat(5 - (data.complexity || 1));
+    infoWindow.setContent(`
+        <div style="font-family:'Segoe UI',sans-serif;min-width:230px;padding:4px 2px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+                <strong>#${data.id.slice(-4).toUpperCase()}</strong>
+                <span style="background:${getColor(data.status)};color:#fff;padding:2px 9px;border-radius:12px;font-size:0.72rem;font-weight:600;">${data.status}</span>
+            </div>
+            <div style="font-size:0.82rem;color:#444;display:grid;gap:3px;line-height:1.5;">
+                <div>📍 ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}</div>
+                <div>⭐ Kompleksnost: ${stars} (${data.complexity || 1}/5)</div>
+                <div>🔧 ${mach}</div>
+                ${data.notes ? `<div>📝 ${data.notes}</div>` : ''}
+                <div style="color:#aaa;font-size:0.72rem;margin-top:3px;">Evidentirano: ${fmtDate(data.dateAdded)}</div>
+            </div>
+        </div>`);
+    infoWindow.open(map, marker);
+}
+
+// =====================================================================
+// CRUD
+// =====================================================================
+async function saveTree() {
+    const db = firebase.firestore();
+    const id  = document.getElementById('tree-id').value;
+    const lat = parseFloat(document.getElementById('tree-lat').value);
+    const lng = parseFloat(document.getElementById('tree-lng').value);
+    const complexity = parseInt(document.getElementById('tree-complexity').value);
+    const status  = document.querySelector('input[name="st"]:checked').value;
+    const notes   = document.getElementById('tree-notes').value.trim();
+    const machinery = [...document.querySelectorAll('input[name="mech"]:checked')].map(c => c.value);
+
+    const payload = {
+        lat, lng, complexity, status, notes, machinery,
+        dateModified: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        if (id) {
+            await db.collection('trees').doc(id).update(payload);
+        } else {
+            payload.dateAdded = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('trees').add(payload);
+        }
+        treeModalBS.hide();
+    } catch (e) {
+        alert('Greška pri spremanju: ' + e.message);
+    }
+}
+
+async function deleteTree() {
+    const id = document.getElementById('tree-id').value;
+    if (!id || !confirm('Obriši ovo stablo?')) return;
+    try {
+        await firebase.firestore().collection('trees').doc(id).delete();
+        treeModalBS.hide();
+    } catch (e) { alert(e.message); }
+}
+
+// =====================================================================
+// MODALNI PROZORI
+// =====================================================================
+function openAddModal(lat, lng) {
+    document.getElementById('tree-id').value = '';
+    document.getElementById('tree-lat').value = lat.toFixed(7);
+    document.getElementById('tree-lng').value = lng.toFixed(7);
+    document.getElementById('tree-notes').value = '';
+    document.getElementById('modal-title').textContent = 'Novo srušeno stablo';
+    document.getElementById('del-btn').style.display = 'none';
+    document.querySelector('input[name="st"][value="evidentirano"]').checked = true;
+    document.querySelectorAll('input[name="mech"]').forEach(c => c.checked = false);
+    setComplexity(1);
+    treeModalBS.show();
+}
+
+function openEditModal(data, db) {
+    document.getElementById('tree-id').value = data.id;
+    document.getElementById('tree-lat').value = data.lat.toFixed(7);
+    document.getElementById('tree-lng').value = data.lng.toFixed(7);
+    document.getElementById('tree-notes').value = data.notes || '';
+    document.getElementById('modal-title').textContent = 'Uredi stablo #' + data.id.slice(-4).toUpperCase();
+    document.getElementById('del-btn').style.display = 'inline-flex';
+
+    const stEl = document.querySelector(`input[name="st"][value="${data.status}"]`);
+    if (stEl) stEl.checked = true;
+    document.querySelectorAll('input[name="mech"]').forEach(c => {
+        c.checked = !!(data.machinery?.includes(c.value));
+    });
+    setComplexity(data.complexity || 1);
+    treeModalBS.show();
+}
+
+// =====================================================================
+// AUTH
+// =====================================================================
+function handleLoginBtn() {
+    if (isLoggedIn) firebase.auth().signOut();
+    else {
+        document.getElementById('inp-email').value = '';
+        document.getElementById('inp-pass').value  = '';
+        document.getElementById('login-err').classList.add('d-none');
+        loginModalBS.show();
+    }
+}
+
+async function doLogin(auth) {
+    auth = auth || firebase.auth();
+    const email = document.getElementById('inp-email').value.trim();
+    const pass  = document.getElementById('inp-pass').value;
+    const err   = document.getElementById('login-err');
+    if (!email || !pass) { err.textContent = 'Unesi email i lozinku.'; err.classList.remove('d-none'); return; }
+    try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        loginModalBS.hide();
+    } catch (e) {
+        err.textContent = 'Pogrešan email ili lozinka.';
+        err.classList.remove('d-none');
+    }
+}
+
+// =====================================================================
+// FILTER
+// =====================================================================
+function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-filter').value = filter;
+    applyFilter();
+    renderPanel();
+}
+
+function applyFilter() {
+    Object.values(markers).forEach(({ marker, data }) => {
+        marker.setMap(currentFilter === 'all' || data.status === currentFilter ? map : null);
+    });
+}
+
+// =====================================================================
+// PANEL
+// =====================================================================
+function togglePanel() { document.getElementById('side-panel').classList.toggle('open'); }
+
+function renderPanel() {
+    const filter = document.getElementById('panel-filter').value;
+    const list   = document.getElementById('panel-list');
+    const trees  = filter === 'all' ? allTrees : allTrees.filter(t => t.status === filter);
+
+    if (!trees.length) {
+        list.innerHTML = '<div class="p-4 text-center text-muted"><i class="bi bi-tree" style="font-size:2rem;"></i><p class="mt-2 mb-0">Nema stabala</p></div>';
+        return;
+    }
+
+    list.innerHTML = trees.map(t => {
+        const cls  = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : 'sa';
+        const mach = t.machinery?.length ? t.machinery.join(', ') : '';
+        const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
+        return `<div class="tree-item" onclick="focusTree('${t.id}')">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                    <div class="fw-semibold small">Stablo #${t.id.slice(-4).toUpperCase()}</div>
+                    <div class="tree-id-label">${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
+                    <div class="text-muted" style="font-size:0.75rem;">${stars}${mach ? ' · ' + mach : ''}</div>
+                </div>
+                <span class="badge-${cls} flex-shrink-0">${t.status}</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:0.72rem;">${fmtDate(t.dateAdded)}</div>
+        </div>`;
+    }).join('');
+}
+
+function focusTree(id) {
+    const entry = markers[id];
+    if (!entry) return;
+    map.panTo(entry.marker.getPosition());
+    map.setZoom(20);
+    if (isLoggedIn) openEditModal(entry.data);
+    else showInfo(entry.data, entry.marker);
+}
+
+// =====================================================================
+// STATISTIKE
+// =====================================================================
+function updateStats() {
+    const c = { evidentirano: 0, 'u postupku': 0, sanirano: 0 };
+    allTrees.forEach(t => { if (c[t.status] !== undefined) c[t.status]++; });
+    document.getElementById('cnt-ev').textContent = c['evidentirano'];
+    document.getElementById('cnt-up').textContent = c['u postupku'];
+    document.getElementById('cnt-sa').textContent = c['sanirano'];
+}
+
+// =====================================================================
+// ZVIJEZDE
+// =====================================================================
+function setComplexity(v) {
+    document.getElementById('tree-complexity').value = v;
+    document.querySelectorAll('#star-row span').forEach((s, i) => {
+        s.classList.toggle('lit', i < v);
+    });
+    document.getElementById('complexity-lbl').textContent = COMPLEXITY_LABELS[v];
+}
+
+// =====================================================================
+// IZVOZ CSV
+// =====================================================================
+function exportCSV() {
+    if (!allTrees.length) { alert('Nema podataka za izvoz.'); return; }
+    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Datum evidencije','Datum izmjene'];
+    const rows = allTrees.map(t => [
+        t.id,
+        t.lat.toFixed(7),
+        t.lng.toFixed(7),
+        t.status,
+        t.complexity || '',
+        (t.machinery?.length ? '"' + t.machinery.join('; ') + '"' : ''),
+        (t.notes ? '"' + t.notes.replace(/"/g,'""') + '"' : ''),
+        fmtDate(t.dateAdded),
+        t.dateModified ? fmtDate(t.dateModified) : ''
+    ]);
+    const csv = '\uFEFF' + [hdr, ...rows].map(r => r.join(',')).join('\r\n');
+    const a = Object.assign(document.createElement('a'), {
+        href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })),
+        download: `mirogoj_stabla_${new Date().toISOString().slice(0,10)}.csv`
+    });
+    a.click(); URL.revokeObjectURL(a.href);
+}
+
+// =====================================================================
+// POMOĆNE FUNKCIJE
+// =====================================================================
+function fmtDate(ts) {
+    if (!ts) return '–';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+</script>
+</body>
+</html>
