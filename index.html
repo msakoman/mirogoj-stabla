@@ -134,6 +134,23 @@
         .star-row span:hover { transform: scale(1.15); }
         .star-row span.lit { color: #f59e0b; }
 
+        /* ---- IMAGE UPLOAD ---- */
+        .img-preview-wrap { position: relative; display: inline-block; }
+        .img-preview-wrap img {
+            border-radius: 8px; border: 1px solid #dee2e6;
+            max-height: 150px; max-width: 100%; object-fit: cover; display: block;
+        }
+        .remove-img-btn {
+            position: absolute; top: -7px; right: -7px;
+            background: #dc2626; color: #fff; border: 2px solid #fff;
+            border-radius: 50%; width: 24px; height: 24px; font-size: 0.8rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            line-height: 1; padding: 0;
+        }
+        .remove-img-btn:hover { background: #b91c1c; }
+        #upload-progress-bar { height: 5px; border-radius: 3px; overflow: hidden; background: #e9ecef; }
+        #upload-progress { height: 100%; background: #143058; transition: width 0.2s; border-radius: 3px; }
+
         /* ---- SETUP BANNER ---- */
         #setup-banner {
             position: absolute; inset: 0; z-index: 9999;
@@ -186,6 +203,20 @@ service cloud.firestore {
     match /trees/{treeId} {
       allow read: if true;
       allow write: if request.auth != null;
+    }
+  }
+}</pre>
+                </div>
+                <div class="setup-step"><strong>Build → Storage</strong> → <em>Get started</em> → <em>Start in production mode</em> → odaberi europe-west1. Zatim Storage → <strong>Rules</strong> → zamijeni s:
+                    <pre class="mt-1 p-2 rounded" style="background:#f8f9fa; font-size:0.75rem; overflow-x:auto;">rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /trees/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   &amp;&amp; request.resource.size &lt; 2 * 1024 * 1024
+                   &amp;&amp; request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null;
     }
   }
 }</pre>
@@ -313,6 +344,7 @@ service cloud.firestore {
             </div>
             <div class="modal-body px-4 py-3">
                 <input type="hidden" id="tree-id">
+                <input type="hidden" id="tree-photo-url">
 
                 <!-- Geolokacija -->
                 <div class="mb-3">
@@ -380,7 +412,7 @@ service cloud.firestore {
                         </div></div>
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Sječkalica" id="m4" name="mech">
-                            <label class="form-check-label small" for="m4">⚙️ Sječkalica</label>
+                            <label class="form-check-label small" for="m4">ښ�️ Sječkalica</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Kamion/prikolica" id="m5" name="mech">
@@ -394,9 +426,32 @@ service cloud.firestore {
                 </div>
 
                 <!-- Napomene -->
-                <div class="mb-1">
+                <div class="mb-3">
                     <label class="form-label small fw-bold">Napomene <span class="fw-normal text-muted">(opcionalno)</span></label>
                     <textarea class="form-control form-control-sm" id="tree-notes" rows="2" placeholder="Npr. lokacija u blizini kapelice, opasno nagnut..."></textarea>
+                </div>
+
+                <!-- Fotografija -->
+                <div class="mb-1">
+                    <label class="form-label small fw-bold">
+                        <i class="bi bi-camera me-1"></i>Fotografija <span class="fw-normal text-muted">(max 2 MB, opcionalno)</span>
+                    </label>
+                    <!-- Preview postojeće ili nove slike -->
+                    <div id="photo-preview-wrap" style="display:none; margin-bottom:8px;">
+                        <div class="img-preview-wrap">
+                            <img id="photo-preview" src="" alt="Fotografija stabla">
+                            <button type="button" class="remove-img-btn" onclick="removePhoto()" title="Ukloni fotografiju">×</button>
+                        </div>
+                    </div>
+                    <!-- Gumb za upload -->
+                    <div id="photo-upload-area">
+                        <input type="file" class="form-control form-control-sm" id="tree-photo-file" accept="image/*">
+                    </div>
+                    <!-- Progress bar -->
+                    <div id="upload-progress-bar" style="display:none; margin-top:6px;">
+                        <div id="upload-progress" style="width:0%;"></div>
+                    </div>
+                    <div id="upload-status" class="small text-muted mt-1" style="display:none;"></div>
                 </div>
             </div>
 
@@ -405,7 +460,7 @@ service cloud.firestore {
                     <i class="bi bi-trash me-1"></i>Obriši
                 </button>
                 <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Odustani</button>
-                <button class="btn btn-sm btn-primary fw-semibold px-4" onclick="saveTree()">
+                <button class="btn btn-sm btn-primary fw-semibold px-4" id="save-btn" onclick="saveTree()">
                     <i class="bi bi-check-lg me-1"></i>Spremi
                 </button>
             </div>
@@ -418,6 +473,7 @@ service cloud.firestore {
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -439,21 +495,20 @@ const GOOGLE_MAPS_API_KEY = "AIzaSyDwqVmd-9UrT3Kg_6sCtNR6WWXwfZcv-Qg";
 
 /* ===================================================================== */
 
-// Provjera je li konfiguracija popunjena
 const IS_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('FIREBASE_'))
                       && GOOGLE_MAPS_API_KEY !== "GOOGLE_MAPS_API_KEY";
 
 // ---- Globalno stanje ----
 let map, infoWindow;
-let markers    = {};   // id → { marker, data }
+let markers    = {};
 let allTrees   = [];
 let isLoggedIn = false;
 let currentFilter = 'all';
 let treeModalBS, loginModalBS;
 
 const MIROGOJ = { lat: 45.8282, lng: 16.0097 };
-
 const COMPLEXITY_LABELS = ['','Jednostavno','Lagano','Srednje','Zahtjevno','Vrlo zahtjevno'];
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
 
 // =====================================================================
 // INICIJALIZACIJA
@@ -474,6 +529,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Enter u polju lozinke
     document.getElementById('inp-pass').addEventListener('keydown', e => {
         if (e.key === 'Enter') doLogin(auth);
+    });
+
+    // Preview slike pri odabiru
+    document.getElementById('tree-photo-file').addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+        if (file.size > MAX_PHOTO_BYTES) {
+            alert('Fotografija je prevelika. Maksimalna veličina je 2 MB.');
+            this.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('photo-preview').src = e.target.result;
+            document.getElementById('photo-preview-wrap').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
     });
 
     // Auth listener
@@ -536,7 +608,6 @@ function initMap(db, auth) {
 // =====================================================================
 function listenToTrees(db) {
     db.collection('trees').orderBy('dateAdded', 'desc').onSnapshot(snap => {
-        // Ukloni stare markere
         Object.values(markers).forEach(({ marker }) => marker.setMap(null));
         markers = {};
         allTrees = [];
@@ -593,10 +664,16 @@ function refreshMarkerListeners(db) {
 }
 
 function showInfo(data, marker) {
-    const mach = data.machinery?.length ? data.machinery.join(', ') : '–';
+    const mach  = data.machinery?.length ? data.machinery.join(', ') : '–';
     const stars = '★'.repeat(data.complexity || 1) + '☆'.repeat(5 - (data.complexity || 1));
+    const photoHtml = data.photoUrl
+        ? `<div style="margin-bottom:8px;">
+               <img src="${data.photoUrl}" alt="Fotografija" style="max-width:100%;max-height:200px;border-radius:7px;border:1px solid #dee2e6;cursor:pointer;" onclick="window.open('${data.photoUrl}','_blank')">
+           </div>`
+        : '';
     infoWindow.setContent(`
-        <div style="font-family:'Segoe UI',sans-serif;min-width:230px;padding:4px 2px;">
+        <div style="font-family:'Segoe UI%,sans-serif;min-width:240px;padding:4px 2px;">
+            ${photoHtml}
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
                 <strong>#${data.id.slice(-4).toUpperCase()}</strong>
                 <span style="background:${getColor(data.status)};color:#fff;padding:2px 9px;border-radius:12px;font-size:0.72rem;font-weight:600;">${data.status}</span>
@@ -616,21 +693,83 @@ function showInfo(data, marker) {
 // CRUD
 // =====================================================================
 async function saveTree() {
-    const db = firebase.firestore();
-    const id  = document.getElementById('tree-id').value;
-    const lat = parseFloat(document.getElementById('tree-lat').value);
-    const lng = parseFloat(document.getElementById('tree-lng').value);
-    const complexity = parseInt(document.getElementById('tree-complexity').value);
-    const status  = document.querySelector('input[name="st"]:checked').value;
-    const notes   = document.getElementById('tree-notes').value.trim();
-    const machinery = [...document.querySelectorAll('input[name="mech"]:checked')].map(c => c.value);
+    const db      = firebase.firestore();
+    const storage = firebase.storage();
 
-    const payload = {
-        lat, lng, complexity, status, notes, machinery,
-        dateModified: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    const id         = document.getElementById('tree-id').value;
+    const lat        = parseFloat(document.getElementById('tree-lat').value);
+    const lng        = parseFloat(document.getElementById('tree-lng').value);
+    const complexity = parseInt(document.getElementById('tree-complexity').value);
+    const status     = document.querySelector('input[name="st"]:checked').value;
+    const notes      = document.getElementById('tree-notes').value.trim();
+    const machinery  = [...document.querySelectorAll('input[name="mech"]:checked')].map(c => c.value);
+    const fileInput  = document.getElementById('tree-photo-file');
+    const file       = fileInput.files[0];
+    let   photoUrl   = document.getElementById('tree-photo-url').value;
+
+    if (file && file.size > MAX_PHOTO_BYTES) {
+        alert('Fotografija je prevelika. Maksimalna veličina je 2 MB.');
+        return;
+    }
+
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sprema...';
 
     try {
+        // Upload fotografije ako je odabrana nova
+        if (file) {
+            const ext     = file.name.split('.').pop().toLowerCase() || 'jpg';
+            // Koristimo privremeni ID za novo stablo, pravi ID za edit
+            const docId   = id || db.collection('trees').doc().id;
+            const path    = `trees/${docId}.${ext}`;
+            const ref     = storage.ref(path);
+
+            // Progress bar
+            const progressWrap = document.getElementById('upload-progress-bar');
+            const progressBar  = document.getElementById('upload-progress');
+            const statusEl     = document.getElementById('upload-status');
+            progressWrap.style.display = 'block';
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Uploading fotografiju...';
+
+            const uploadTask = ref.put(file, { contentType: file.type });
+            await new Promise((resolve, reject) => {
+                uploadTask.on('state_changed',
+                    snap => {
+                        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+                        progressBar.style.width = pct + '%';
+                        statusEl.textContent = `Upload: ${pct}%`;
+                    },
+                    reject,
+                    resolve
+                );
+            });
+
+            photoUrl = await ref.getDownloadURL();
+            progressWrap.style.display = 'none';
+            statusEl.style.display = 'none';
+
+            // Ako je novo stablo, spremi ga s poznatim ID-em
+            if (!id) {
+                const payload = {
+                    lat, lng, complexity, status, notes, machinery,
+                    photoUrl,
+                    dateAdded:    firebase.firestore.FieldValue.serverTimestamp(),
+                    dateModified: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await db.collection('trees').doc(docId).set(payload);
+                treeModalBS.hide();
+                return;
+            }
+        }
+
+        const payload = {
+            lat, lng, complexity, status, notes, machinery,
+            photoUrl: photoUrl || null,
+            dateModified: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
         if (id) {
             await db.collection('trees').doc(id).update(payload);
         } else {
@@ -640,6 +779,9 @@ async function saveTree() {
         treeModalBS.hide();
     } catch (e) {
         alert('Greška pri spremanju: ' + e.message);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Spremi';
     }
 }
 
@@ -647,6 +789,13 @@ async function deleteTree() {
     const id = document.getElementById('tree-id').value;
     if (!id || !confirm('Obriši ovo stablo?')) return;
     try {
+        // Pokušaj obrisati i fotografiju iz Storage-a (ako postoji)
+        const photoUrl = document.getElementById('tree-photo-url').value;
+        if (photoUrl) {
+            try {
+                await firebase.storage().refFromURL(photoUrl).delete();
+            } catch (_) { /* fotografija možda ne postoji, nastavi */ }
+        }
         await firebase.firestore().collection('trees').doc(id).delete();
         treeModalBS.hide();
     } catch (e) { alert(e.message); }
@@ -655,26 +804,50 @@ async function deleteTree() {
 // =====================================================================
 // MODALNI PROZORI
 // =====================================================================
+function resetPhotoUI() {
+    document.getElementById('tree-photo-file').value = '';
+    document.getElementById('tree-photo-url').value  = '';
+    document.getElementById('photo-preview-wrap').style.display = 'none';
+    document.getElementById('upload-progress-bar').style.display = 'none';
+    document.getElementById('upload-status').style.display = 'none';
+    document.getElementById('upload-progress').style.width = '0%';
+}
+
+function showPhotoPreview(url) {
+    if (url) {
+        document.getElementById('photo-preview').src = url;
+        document.getElementById('photo-preview-wrap').style.display = 'block';
+    } else {
+        document.getElementById('photo-preview-wrap').style.display = 'none';
+    }
+    document.getElementById('tree-photo-url').value = url || '';
+}
+
+function removePhoto() {
+    resetPhotoUI();
+}
+
 function openAddModal(lat, lng) {
-    document.getElementById('tree-id').value = '';
-    document.getElementById('tree-lat').value = lat.toFixed(7);
-    document.getElementById('tree-lng').value = lng.toFixed(7);
+    document.getElementById('tree-id').value    = '';
+    document.getElementById('tree-lat').value   = lat.toFixed(7);
+    document.getElementById('tree-lng').value   = lng.toFixed(7);
     document.getElementById('tree-notes').value = '';
     document.getElementById('modal-title').textContent = 'Novo srušeno stablo';
-    document.getElementById('del-btn').style.display = 'none';
+    document.getElementById('del-btn').style.display   = 'none';
     document.querySelector('input[name="st"][value="evidentirano"]').checked = true;
     document.querySelectorAll('input[name="mech"]').forEach(c => c.checked = false);
     setComplexity(1);
+    resetPhotoUI();
     treeModalBS.show();
 }
 
 function openEditModal(data, db) {
-    document.getElementById('tree-id').value = data.id;
-    document.getElementById('tree-lat').value = data.lat.toFixed(7);
-    document.getElementById('tree-lng').value = data.lng.toFixed(7);
+    document.getElementById('tree-id').value    = data.id;
+    document.getElementById('tree-lat').value   = data.lat.toFixed(7);
+    document.getElementById('tree-lng').value   = data.lng.toFixed(7);
     document.getElementById('tree-notes').value = data.notes || '';
     document.getElementById('modal-title').textContent = 'Uredi stablo #' + data.id.slice(-4).toUpperCase();
-    document.getElementById('del-btn').style.display = 'inline-flex';
+    document.getElementById('del-btn').style.display   = 'inline-flex';
 
     const stEl = document.querySelector(`input[name="st"][value="${data.status}"]`);
     if (stEl) stEl.checked = true;
@@ -682,6 +855,11 @@ function openEditModal(data, db) {
         c.checked = !!(data.machinery?.includes(c.value));
     });
     setComplexity(data.complexity || 1);
+
+    // Fotografija
+    resetPhotoUI();
+    showPhotoPreview(data.photoUrl || null);
+
     treeModalBS.show();
 }
 
@@ -747,15 +925,21 @@ function renderPanel() {
     }
 
     list.innerHTML = trees.map(t => {
-        const cls  = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : 'sa';
-        const mach = t.machinery?.length ? t.machinery.join(', ') : '';
+        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : 'sa';
+        const mach  = t.machinery?.length ? t.machinery.join(', ') : '';
         const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
+        const thumb = t.photoUrl
+            ? `<img src="${t.photoUrl}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #eee;flex-shrink:0;">`
+            : '';
         return `<div class="tree-item" onclick="focusTree('${t.id}')">
             <div class="d-flex justify-content-between align-items-start gap-2">
-                <div>
-                    <div class="fw-semibold small">Stablo #${t.id.slice(-4).toUpperCase()}</div>
-                    <div class="tree-id-label">${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
-                    <div class="text-muted" style="font-size:0.75rem;">${stars}${mach ? ' · ' + mach : ''}</div>
+                <div class="d-flex gap-2 align-items-start" style="min-width:0;">
+                    ${thumb}
+                    <div style="min-width:0;">
+                        <div class="fw-semibold small">Stablo #${t.id.slice(-4).toUpperCase()}</div>
+                        <div class="tree-id-label">${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">${stars}${mach ? ' · ' + mach : ''}</div>
+                    </div>
                 </div>
                 <span class="badge-${cls} flex-shrink-0">${t.status}</span>
             </div>
@@ -800,7 +984,7 @@ function setComplexity(v) {
 // =====================================================================
 function exportCSV() {
     if (!allTrees.length) { alert('Nema podataka za izvoz.'); return; }
-    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Datum evidencije','Datum izmjene'];
+    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Fotografija URL','Datum evidencije','Datum izmjene'];
     const rows = allTrees.map(t => [
         t.id,
         t.lat.toFixed(7),
@@ -809,6 +993,7 @@ function exportCSV() {
         t.complexity || '',
         (t.machinery?.length ? '"' + t.machinery.join('; ') + '"' : ''),
         (t.notes ? '"' + t.notes.replace(/"/g,'""') + '"' : ''),
+        t.photoUrl || '',
         fmtDate(t.dateAdded),
         t.dateModified ? fmtDate(t.dateModified) : ''
     ]);
