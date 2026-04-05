@@ -46,6 +46,7 @@
         .stat-pill.ev { background: #fee2e2; color: #dc2626; }
         .stat-pill.up { background: #fef3c7; color: #b45309; }
         .stat-pill.sa { background: #dcfce7; color: #15803d; }
+        .stat-pill.cp { background: #f3e8ff; color: #7c3aed; }
 
         /* ---- FILTER BAR (left) ---- */
         #filter-bar {
@@ -100,6 +101,7 @@
         .badge-ev { background: #fee2e2; color: #dc2626; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
         .badge-up { background: #fef3c7; color: #b45309; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
         .badge-sa { background: #dcfce7; color: #15803d; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+        .badge-cp { background: #f3e8ff; color: #7c3aed; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
 
         /* ---- MODE INDICATOR ---- */
         #mode-indicator {
@@ -123,6 +125,7 @@
         .ev-label { background: #fee2e2; color: #dc2626; }
         .up-label { background: #fef3c7; color: #b45309; }
         .sa-label { background: #dcfce7; color: #15803d; }
+        .cp-label { background: #f3e8ff; color: #7c3aed; }
         .status-option input:checked + .status-label { border-color: currentColor; box-shadow: 0 0 0 2px rgba(0,0,0,0.08); }
 
         /* ---- STAR RATING ---- */
@@ -268,6 +271,7 @@ service firebase.storage {
 <div id="stats-bar">
     <div class="stat-pill ev"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-ev">0</span> Evidentirano</div>
     <div class="stat-pill up"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-up">0</span> U postupku</div>
+    <div class="stat-pill cp"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-cp">0</span> Čeka panj</div>
     <div class="stat-pill sa"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-sa">0</span> Sanirano</div>
 </div>
 
@@ -276,6 +280,7 @@ service firebase.storage {
     <button class="filter-btn active" onclick="setFilter('all',this)"><i class="bi bi-layers"></i> Sve</button>
     <button class="filter-btn" onclick="setFilter('evidentirano',this)"><span style="color:#dc2626">●</span> Evidentirano</button>
     <button class="filter-btn" onclick="setFilter('u postupku',this)"><span style="color:#b45309">●</span> U postupku</button>
+    <button class="filter-btn" onclick="setFilter('čeka panj',this)"><span style="color:#7c3aed">●</span> Čeka panj</button>
     <button class="filter-btn" onclick="setFilter('sanirano',this)"><span style="color:#15803d">●</span> Sanirano</button>
 </div>
 
@@ -298,6 +303,7 @@ service firebase.storage {
             <option value="all">Sve</option>
             <option value="evidentirano">Evidentirano</option>
             <option value="u postupku">U postupku</option>
+            <option value="čeka panj">Čeka panj</option>
             <option value="sanirano">Sanirano</option>
         </select>
     </div>
@@ -375,6 +381,10 @@ service firebase.storage {
                         <label class="status-option">
                             <input type="radio" name="st" value="u postupku">
                             <span class="status-label up-label">● U postupku</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="st" value="čeka panj">
+                            <span class="status-label cp-label">● Čeka panj</span>
                         </label>
                         <label class="status-option">
                             <input type="radio" name="st" value="sanirano">
@@ -727,7 +737,7 @@ function listenToTrees(db) {
 // MARKERI
 // =====================================================================
 function getColor(status) {
-    return { evidentirano: '#dc2626', 'u postupku': '#d97706', sanirano: '#16a34a' }[status] ?? '#6b7280';
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', 'čeka panj': '#7c3aed', sanirano: '#16a34a' }[status] ?? '#6b7280';
 }
 
 function addMarker(data, db) {
@@ -778,7 +788,7 @@ function showInfo(data, marker) {
            </div>`
         : '';
     infoWindow.setContent(`
-        <div style="font-family:'Segoe UI'\sans-serif;min-width:240px;padding:4px 2px;">
+        <div style="font-family:'Segoe UI',sans-serif;min-width:240px;padding:4px 2px;">
             ${photoHtml}
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
                 <strong>#${data.id.slice(-4).toUpperCase()}</strong>
@@ -1026,7 +1036,7 @@ function renderPanel() {
     }
 
     list.innerHTML = trees.map(t => {
-        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : 'sa';
+        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : t.status === 'čeka panj' ? 'cp' : 'sa';
         const mach  = t.machinery?.length ? t.machinery.join(', ') : '';
         const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
         const firstPhoto = t.photoUrl || t.photoUrl2 || t.photoUrl3;
@@ -1063,10 +1073,11 @@ function focusTree(id) {
 // STATISTIKE
 // =====================================================================
 function updateStats() {
-    const c = { evidentirano: 0, 'u postupku': 0, sanirano: 0 };
+    const c = { evidentirano: 0, 'u postupku': 0, 'čeka panj': 0, sanirano: 0 };
     allTrees.forEach(t => { if (c[t.status] !== undefined) c[t.status]++; });
     document.getElementById('cnt-ev').textContent = c['evidentirano'];
     document.getElementById('cnt-up').textContent = c['u postupku'];
+    document.getElementById('cnt-cp').textContent = c['čeka panj'];
     document.getElementById('cnt-sa').textContent = c['sanirano'];
 }
 
@@ -1086,7 +1097,7 @@ function setComplexity(v) {
 // =====================================================================
 function exportCSV() {
     if (!allTrees.length) { alert('Nema podataka za izvoz.'); return; }
-    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Slika 1 (poÍetno)','Slika 2 (tijek)','Slika 3 (završno)','Datum evidencije','Datum izmjene'];
+    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Slika 1 (početno)','Slika 2 (tijek)','Slika 3 (završno)','Datum evidencije','Datum izmjene'];
     const rows = allTrees.map(t => [
         t.id,
         t.lat.toFixed(7),
@@ -1164,6 +1175,7 @@ function generateReport() {
     // Analiza podataka
     const total     = allTrees.length;
     const sanirano  = allTrees.filter(t => t.status === 'sanirano').length;
+    const cekaPanj  = allTrees.filter(t => t.status === 'čeka panj').length;
     const uPostupku = allTrees.filter(t => t.status === 'u postupku').length;
     const evid      = allTrees.filter(t => t.status === 'evidentirano').length;
 
@@ -1221,7 +1233,7 @@ function generateReport() {
 
     const reportText = buildReportText({
         fromDate, toDate, fromStr, toStr,
-        total, sanirano, uPostupku, evid,
+        total, sanirano, cekaPanj, uPostupku, evid,
         newInPeriod, statusChangesInPeriod, completedInPeriod,
         topMach, avgComplexity, remaining: remaining.length
     });
@@ -1229,26 +1241,30 @@ function generateReport() {
     // Prikaži statistike
     const pct = Math.round((sanirano / total) * 100);
     document.getElementById('report-stats').innerHTML = `
-        <div class="col-6 col-sm-3"><div class="border rounded p-2 text-center" style="background:#fff;">
+        <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-danger" style="font-size:1.3rem;">${evid}</div>
             <div class="text-muted" style="font-size:0.72rem;">Evidentirano</div>
         </div></div>
-        <div class="col-6 col-sm-3"><div class="border rounded p-2 text-center" style="background:#fff;">
+        <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-warning" style="font-size:1.3rem;">${uPostupku}</div>
             <div class="text-muted" style="font-size:0.72rem;">U postupku</div>
         </div></div>
-        <div class="col-6 col-sm-3"><div class="border rounded p-2 text-center" style="background:#fff;">
+        <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
+            <div class="fw-bold" style="font-size:1.3rem;color:#7c3aed;">${cekaPanj}</div>
+            <div class="text-muted" style="font-size:0.72rem;">Čeka panj</div>
+        </div></div>
+        <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-success" style="font-size:1.3rem;">${sanirano}</div>
             <div class="text-muted" style="font-size:0.72rem;">Sanirano</div>
         </div></div>
-        <div class="col-6 col-sm-3"><div class="border rounded p-2 text-center" style="background:#fff;">
+        <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-primary" style="font-size:1.3rem;">${pct}%</div>
             <div class="text-muted" style="font-size:0.72rem;">Dovršenost</div>
         </div></div>
     `;
 
     document.getElementById('report-text').innerHTML = reportText
-        .split(/(?<=[a-z\u010d\u0107\u0161\u0111\u017eA-Z\u010c\u0106\u0160\u0110\u017d])\.\s/)
+        .split(/(?<=[a-zčćšđžA-ZČĆŠĐŽ])\. /)
         .filter(Boolean)
         .map(s => `<p class="mb-1">${s.trim()}${s.trim().endsWith('.') ? '' : '.'}</p>`)
         .join('');
@@ -1257,7 +1273,7 @@ function generateReport() {
     document.getElementById('report-output').style.display  = 'block';
 }
 
-function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, uPostupku, evid,
+function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, cekaPanj, uPostupku, evid,
     newInPeriod, statusChangesInPeriod, completedInPeriod, topMach, avgComplexity, remaining }) {
 
     const fmtD = s => new Date(s + 'T00:00:00').toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric' });
@@ -1269,7 +1285,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, uP
         ? 'Od početka evidencije'
         : `U periodu od ${fmtD(fromStr)} do ${fmtD(toStr)}`;
     sentences.push(
-        `${periodLabel} evidentirano je ukupno ${total} srušenih stabala na groblju Mirogoi, od čega ${sanirano} sanirano, ${uPostupku} u postupku sanacije, a ${evid} čeka intervenciju.`
+        `${periodLabel} evidentirano je ukupno ${total} srušenih stabala na groblju Mirogoj, od čega ${sanirano} sanirano, ${cekaPanj > 0 ? `${cekaPanj} čeka vađenje panja, ` : ''}${uPostupku} u postupku sanacije, a ${evid} čeka intervenciju.`
     );
 
     // 2. Aktivnost u periodu
@@ -1318,7 +1334,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, uP
     } else if (pct >= 50) {
         sentences.push('Dostignut je znatan napredak; preporuča se nastaviti planiranim tempom sanacije.');
     } else if (pct >= 25) {
-        sentences.push('Radovi su u tijeku; preporuča se ubrzati sanaciju visokorizičnih stabala s oznakom "Evidentirano".');
+        sentences.push('Radovi su u tijeku; preporuča se ubrzati sanaciju visokorizečnih stabala s oznakom "Evidentirano".');
     } else {
         sentences.push('Sanacija je u početnoj fazi; preporuča se prioritizirati stabla visoke rizičnosti i zahtjevnosti.');
     }
