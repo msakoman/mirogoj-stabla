@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Evidencija sruÅ¡enih stabala â Mirogoj</title>
+    <title>Evidencija srušenih stabala – Mirogoj</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -186,7 +186,7 @@
 <div id="setup-banner" style="display:none;">
     <div class="card shadow-lg">
         <div class="card-header" style="background:#143058; color:#fff;">
-            <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Postavljanje aplikacije â jednokratno</h5>
+            <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Postavljanje aplikacije – jednokratno</h5>
         </div>
         <div class="card-body" style="max-height:80vh; overflow-y:auto;">
             <p class="text-muted mb-3" style="font-size:0.88rem;">
@@ -194,13 +194,13 @@
                 Obje usluge imaju besplatni tier koji je dovoljan za ovaj projekt.
             </p>
 
-            <h6 class="fw-bold mb-2">ð¥ Korak 1 â Firebase</h6>
+            <h6 class="fw-bold mb-2">🔥 Korak 1 – Firebase</h6>
             <div class="setup-steps mb-3" style="font-size:0.85rem;">
                 <div class="setup-step">Idi na <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> i klikni <strong>Add project</strong>. Imenuj projekt (npr. <em>mirogoj-stabla</em>).</div>
-                <div class="setup-step">U izborniku lijevo â <strong>Build â Authentication</strong> â <em>Get started</em> â <strong>Email/Password</strong> â Enable â Save.</div>
-                <div class="setup-step">Authentication â <strong>Users</strong> â <em>Add user</em>: upiÅ¡i email i lozinku za prijavu u aplikaciju.</div>
-                <div class="setup-step"><strong>Build â Firestore Database</strong> â <em>Create database</em> â <em>Start in production mode</em> â odaberi europe-west3 (Frankfurt).</div>
-                <div class="setup-step">Firestore â <strong>Rules</strong> â zamijeni sve s kodom ispod â Publish:
+                <div class="setup-step">U izborniku lijevo → <strong>Build → Authentication</strong> → <em>Get started</em> → <strong>Email/Password</strong> → Enable → Save.</div>
+                <div class="setup-step">Authentication → <strong>Users</strong> → <em>Add user</em>: upiši email i lozinku za prijavu u aplikaciju.</div>
+                <div class="setup-step"><strong>Build → Firestore Database</strong> → <em>Create database</em> → <em>Start in production mode</em> → odaberi europe-west3 (Frankfurt).</div>
+                <div class="setup-step">Firestore → <strong>Rules</strong> → zamijeni sve s kodom ispod → Publish:
                     <pre class="mt-1 p-2 rounded" style="background:#f8f9fa; font-size:0.75rem; overflow-x:auto;">rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -211,7 +211,7 @@ service cloud.firestore {
   }
 }</pre>
                 </div>
-                <div class="setup-step"><strong>Build â Storage</strong> â <em>Get started</em> â <em>Start in production mode</em> â odaberi europe-west1. Zatim Storage â <strong>Rules</strong> â zamijeni s:
+                <div class="setup-step"><strong>Build → Storage</strong> → <em>Get started</em> → <em>Start in production mode</em> → odaberi europe-west1. Zatim Storage → <strong>Rules</strong> → zamijeni s:
                     <pre class="mt-1 p-2 rounded" style="background:#f8f9fa; font-size:0.75rem; overflow-x:auto;">rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
@@ -225,24 +225,24 @@ service firebase.storage {
   }
 }</pre>
                 </div>
-                <div class="setup-step">Project Settings (zupÄanik gore lijevo) â <em>Your apps</em> â <strong>&lt;/&gt;</strong> (Web) â Registriraj app â kopiraj <code>firebaseConfig</code> objekt.</div>
+                <div class="setup-step">Project Settings (zupčanik gore lijevo) → <em>Your apps</em> → <strong>&lt;/&gt;</strong> (Web) → Registriraj app → kopiraj <code>firebaseConfig</code> objekt.</div>
             </div>
 
-            <h6 class="fw-bold mb-2">ðºï¸ Korak 2 â Google Maps API kljuÄ</h6>
+            <h6 class="fw-bold mb-2">🗺️ Korak 2 – Google Maps API ključ</h6>
             <div class="setup-steps mb-3" style="font-size:0.85rem;">
-                <div class="setup-step">Idi na <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> â odaberi isti projekt ili kreiraj novi.</div>
-                <div class="setup-step"><strong>APIs &amp; Services â Library</strong> â traÅ¾i <em>"Maps JavaScript API"</em> â Enable.</div>
-                <div class="setup-step"><strong>APIs &amp; Services â Credentials â Create Credentials â API key</strong>. Kopiraj kljuÄ.</div>
+                <div class="setup-step">Idi na <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → odaberi isti projekt ili kreiraj novi.</div>
+                <div class="setup-step"><strong>APIs &amp; Services → Library</strong> → traži <em>"Maps JavaScript API"</em> → Enable.</div>
+                <div class="setup-step"><strong>APIs &amp; Services → Credentials → Create Credentials → API key</strong>. Kopiraj ključ.</div>
             </div>
 
-            <h6 class="fw-bold mb-2">âï¸ Korak 3 â Unesi kljuÄeve u aplikaciju</h6>
+            <h6 class="fw-bold mb-2">⚙️ Korak 3 – Unesi ključeve u aplikaciju</h6>
             <p style="font-size:0.85rem;">
-                Otvori <code>index.html</code> u tekst editoru, pronaÄi sekciju <code>// ===== KONFIGURACIJA =====</code>
-                i zamijeni placeholder vrijednosti s pravim kljuÄevima.
+                Otvori <code>index.html</code> u tekst editoru, pronađi sekciju <code>// ===== KONFIGURACIJA =====</code>
+                i zamijeni placeholder vrijednosti s pravim ključevima.
             </p>
 
             <button class="btn btn-primary w-100 mt-2" onclick="document.getElementById('setup-banner').style.display='none'">
-                VeÄ sam postavio kljuÄeve â zatvori ovo
+                Već sam postavio ključeve – zatvori ovo
             </button>
         </div>
     </div>
@@ -252,14 +252,14 @@ service firebase.storage {
 <div id="navbar">
     <div class="logo">
         <i class="bi bi-tree-fill"></i>
-        <span class="logo-text">Evidencija sruÅ¡enih stabala â Mirogoj</span>
+        <span class="logo-text">Evidencija srušenih stabala – Mirogoj</span>
     </div>
     <div class="nav-actions">
         <button class="btn btn-sm btn-outline-light" onclick="exportCSV()" title="Izvoz podataka u CSV">
             <i class="bi bi-download me-1"></i><span class="d-none d-sm-inline">Izvoz CSV</span>
         </button>
-        <button class="btn btn-sm btn-outline-light" onclick="openReportModal()" title="Generiraj izvjeÅ¡taj o napretku">
-            <i class="bi bi-bar-chart-line me-1"></i><span class="d-none d-sm-inline">IzvjeÅ¡taj</span>
+        <button class="btn btn-sm btn-outline-light" onclick="openReportModal()" title="Generiraj izvještaj o napretku">
+            <i class="bi bi-bar-chart-line me-1"></i><span class="d-none d-sm-inline">Izvještaj</span>
         </button>
         <button class="btn btn-sm" id="login-btn" onclick="handleLoginBtn()">
             <i class="bi bi-person-lock me-1"></i><span id="login-label">Prijava</span>
@@ -271,17 +271,17 @@ service firebase.storage {
 <div id="stats-bar">
     <div class="stat-pill ev"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-ev">0</span> Evidentirano</div>
     <div class="stat-pill up"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-up">0</span> U postupku</div>
-    <div class="stat-pill cp"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-cp">0</span> Äeka panj</div>
+    <div class="stat-pill cp"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-cp">0</span> Čeka panj</div>
     <div class="stat-pill sa"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-sa">0</span> Sanirano</div>
 </div>
 
 <!-- ===================== FILTER BAR ===================== -->
 <div id="filter-bar">
     <button class="filter-btn active" onclick="setFilter('all',this)"><i class="bi bi-layers"></i> Sve</button>
-    <button class="filter-btn" onclick="setFilter('evidentirano',this)"><span style="color:#dc2626">â</span> Evidentirano</button>
-    <button class="filter-btn" onclick="setFilter('u postupku',this)"><span style="color:#b45309">â</span> U postupku</button>
-    <button class="filter-btn" onclick="setFilter('Äeka panj',this)"><span style="color:#7c3aed">â</span> Äeka panj</button>
-    <button class="filter-btn" onclick="setFilter('sanirano',this)"><span style="color:#15803d">â</span> Sanirano</button>
+    <button class="filter-btn" onclick="setFilter('evidentirano',this)"><span style="color:#dc2626">●</span> Evidentirano</button>
+    <button class="filter-btn" onclick="setFilter('u postupku',this)"><span style="color:#b45309">●</span> U postupku</button>
+    <button class="filter-btn" onclick="setFilter('čeka panj',this)"><span style="color:#7c3aed">●</span> Čeka panj</button>
+    <button class="filter-btn" onclick="setFilter('sanirano',this)"><span style="color:#15803d">●</span> Sanirano</button>
 </div>
 
 <!-- ===================== MAP ===================== -->
@@ -303,7 +303,7 @@ service firebase.storage {
             <option value="all">Sve</option>
             <option value="evidentirano">Evidentirano</option>
             <option value="u postupku">U postupku</option>
-            <option value="Äeka panj">Äeka panj</option>
+            <option value="čeka panj">Čeka panj</option>
             <option value="sanirano">Sanirano</option>
         </select>
     </div>
@@ -332,7 +332,7 @@ service firebase.storage {
                 </div>
                 <div class="mb-4 text-start">
                     <label class="form-label small fw-semibold">Lozinka</label>
-                    <input type="password" class="form-control" id="inp-pass" autocomplete="current-password" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢">
+                    <input type="password" class="form-control" id="inp-pass" autocomplete="current-password" placeholder="••••••••">
                 </div>
                 <button class="btn btn-primary w-100 fw-semibold" onclick="doLogin()">
                     <i class="bi bi-box-arrow-in-right me-2"></i>Prijavi se
@@ -348,7 +348,7 @@ service firebase.storage {
         <div class="modal-content">
             <div class="modal-header py-3" style="background:#143058; color:#fff;">
                 <h5 class="modal-title mb-0">
-                    <i class="bi bi-tree-fill me-2"></i><span id="modal-title">Novo sruÅ¡eno stablo</span>
+                    <i class="bi bi-tree-fill me-2"></i><span id="modal-title">Novo srušeno stablo</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -376,19 +376,19 @@ service firebase.storage {
                     <div class="d-flex gap-2 flex-wrap">
                         <label class="status-option">
                             <input type="radio" name="st" value="evidentirano" checked>
-                            <span class="status-label ev-label">â Evidentirano</span>
+                            <span class="status-label ev-label">● Evidentirano</span>
                         </label>
                         <label class="status-option">
                             <input type="radio" name="st" value="u postupku">
-                            <span class="status-label up-label">â U postupku</span>
+                            <span class="status-label up-label">● U postupku</span>
                         </label>
                         <label class="status-option">
-                            <input type="radio" name="st" value="Äeka panj">
-                            <span class="status-label cp-label">â Äeka panj</span>
+                            <input type="radio" name="st" value="čeka panj">
+                            <span class="status-label cp-label">● Čeka panj</span>
                         </label>
                         <label class="status-option">
                             <input type="radio" name="st" value="sanirano">
-                            <span class="status-label sa-label">â Sanirano</span>
+                            <span class="status-label sa-label">● Sanirano</span>
                         </label>
                     </div>
                 </div>
@@ -398,11 +398,11 @@ service firebase.storage {
                     <label class="form-label small fw-bold">Kompleksnost sanacije</label>
                     <div class="d-flex align-items-center gap-3">
                         <div class="star-row" id="star-row">
-                            <span onclick="setComplexity(1)">â</span>
-                            <span onclick="setComplexity(2)">â</span>
-                            <span onclick="setComplexity(3)">â</span>
-                            <span onclick="setComplexity(4)">â</span>
-                            <span onclick="setComplexity(5)">â</span>
+                            <span onclick="setComplexity(1)">★</span>
+                            <span onclick="setComplexity(2)">★</span>
+                            <span onclick="setComplexity(3)">★</span>
+                            <span onclick="setComplexity(4)">★</span>
+                            <span onclick="setComplexity(5)">★</span>
                         </div>
                         <span id="complexity-lbl" class="text-muted small"></span>
                     </div>
@@ -415,27 +415,27 @@ service firebase.storage {
                     <div class="row g-2">
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Motorna pila" id="m1" name="mech">
-                            <label class="form-check-label small" for="m1">ðª Motorna pila</label>
+                            <label class="form-check-label small" for="m1">🪚 Motorna pila</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="UtovarivaÄ" id="m2" name="mech">
-                            <label class="form-check-label small" for="m2">ð UtovarivaÄ</label>
+                            <input class="form-check-input" type="checkbox" value="Utovarivač" id="m2" name="mech">
+                            <label class="form-check-label small" for="m2">🚛 Utovarivač</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Dizalica/kran" id="m3" name="mech">
-                            <label class="form-check-label small" for="m3">ðï¸ Dizalica/kran</label>
+                            <label class="form-check-label small" for="m3">🏗️ Dizalica/kran</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="SjeÄkalica" id="m4" name="mech">
-                            <label class="form-check-label small" for="m4">âï¸ SjeÄkalica</label>
+                            <input class="form-check-input" type="checkbox" value="Sječkalica" id="m4" name="mech">
+                            <label class="form-check-label small" for="m4">⚙️ Sječkalica</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Kamion/prikolica" id="m5" name="mech">
-                            <label class="form-check-label small" for="m5">ð Kamion/prikolica</label>
+                            <label class="form-check-label small" for="m5">🚚 Kamion/prikolica</label>
                         </div></div>
                         <div class="col-6"><div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Samo ruÄni rad" id="m6" name="mech">
-                            <label class="form-check-label small" for="m6">ð· Samo ruÄni rad</label>
+                            <input class="form-check-input" type="checkbox" value="Samo ručni rad" id="m6" name="mech">
+                            <label class="form-check-label small" for="m6">👷 Samo ručni rad</label>
                         </div></div>
                     </div>
                 </div>
@@ -449,15 +449,15 @@ service firebase.storage {
                 <!-- Fotografije (max 3) -->
                 <div class="mb-1">
                     <label class="form-label small fw-bold">
-                        <i class="bi bi-camera me-1"></i>Fotografije <span class="fw-normal text-muted">(max 3 Ã 2 MB, opcionalno)</span>
+                        <i class="bi bi-camera me-1"></i>Fotografije <span class="fw-normal text-muted">(max 3 × 2 MB, opcionalno)</span>
                     </label>
                     <!-- Slot 1 -->
                     <div class="photo-slot mb-2">
-                        <div class="small text-muted mb-1">ð· Slika 1 â PoÄetno stanje</div>
+                        <div class="small text-muted mb-1">📷 Slika 1 – Početno stanje</div>
                         <div id="photo-preview-wrap-1" style="display:none;margin-bottom:6px;">
                             <div class="img-preview-wrap">
                                 <img id="photo-preview-1" src="" alt="Slika 1">
-                                <button type="button" class="remove-img-btn" onclick="removePhoto(1)" title="Ukloni">Ã</button>
+                                <button type="button" class="remove-img-btn" onclick="removePhoto(1)" title="Ukloni">×</button>
                             </div>
                         </div>
                         <input type="hidden" id="tree-photo-url-1">
@@ -468,11 +468,11 @@ service firebase.storage {
                     </div>
                     <!-- Slot 2 -->
                     <div class="photo-slot mb-2">
-                        <div class="small text-muted mb-1">ð· Slika 2 â Tijek radova</div>
+                        <div class="small text-muted mb-1">📷 Slika 2 – Tijek radova</div>
                         <div id="photo-preview-wrap-2" style="display:none;margin-bottom:6px;">
                             <div class="img-preview-wrap">
                                 <img id="photo-preview-2" src="" alt="Slika 2">
-                                <button type="button" class="remove-img-btn" onclick="removePhoto(2)" title="Ukloni">Ã</button>
+                                <button type="button" class="remove-img-btn" onclick="removePhoto(2)" title="Ukloni">×</button>
                             </div>
                         </div>
                         <input type="hidden" id="tree-photo-url-2">
@@ -483,25 +483,25 @@ service firebase.storage {
                     </div>
                     <!-- Slot 3 -->
                     <div class="photo-slot">
-                        <div class="small text-muted mb-1">ð· Slika 3 â Nakon uklanjanja</div>
+                        <div class="small text-muted mb-1">📷 Slika 3 – Nakon uklanjanja</div>
                         <div id="photo-preview-wrap-3" style="display:none;margin-bottom:6px;">
                             <div class="img-preview-wrap">
                                 <img id="photo-preview-3" src="" alt="Slika 3">
-                                <button type="button" class="remove-img-btn" onclick="removePhoto(3)" title="Ukloni">Ã</button>
+                                <button type="button" class="remove-img-btn" onclick="removePhoto(3)" title="Ukloni">×</button>
                             </div>
                         </div>
                         <input type="hidden" id="tree-photo-url-3">
                         <input type="file" class="form-control form-control-sm" id="tree-photo-file-3" accept="image/*">
                         <div id="upload-progress-bar-3" style="display:none;margin-top:4px;height:4px;background:#e9ecef;border-radius:2px;">
                             <div id="upload-progress-3" style="width:0%;height:100%;background:#143058;border-radius:2px;transition:width 0.2s;"></div>
-                        </div>
+         !              </div>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer py-2">
                 <button class="btn btn-sm btn-outline-danger me-auto" id="del-btn" onclick="deleteTree()" style="display:none;">
-                    <i class="bi bi-trash me-1"></i>ObriÅ¡i
+                    <i class="bi bi-trash me-1"></i>Obriši
                 </button>
                 <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Odustani</button>
                 <button class="btn btn-sm btn-primary fw-semibold px-4" id="save-btn" onclick="saveTree()">
@@ -517,7 +517,7 @@ service firebase.storage {
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header py-2" style="background:#143058;color:#fff;">
-                <h5 class="modal-title mb-0"><i class="bi bi-bar-chart-line me-2"></i>IzvjeÅ¡taj o napretku sanacije</h5>
+                <h5 class="modal-title mb-0"><i class="bi bi-bar-chart-line me-2"></i>Izvještaj o napretku sanacije</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -537,7 +537,7 @@ service firebase.storage {
                         </button>
                     </div>
                 </div>
-                <!-- Brze preÄice -->
+                <!-- Brze prečice -->
                 <div class="d-flex gap-2 flex-wrap mb-3">
                     <span class="small text-muted me-1 d-flex align-items-center">Brzi odabir:</span>
                     <button class="btn btn-sm btn-outline-secondary px-3" onclick="setReportPeriod(1)">24h</button>
@@ -548,12 +548,12 @@ service firebase.storage {
                 <!-- Rezultat -->
                 <div id="report-loading" style="display:none;" class="text-center py-3">
                     <div class="spinner-border spinner-border-sm text-primary me-2"></div>
-                    <span class="text-muted small">Generiranje izvjeÅ¡taja...</span>
+                    <span class="text-muted small">Generiranje izvještaja...</span>
                 </div>
                 <div id="report-output" style="display:none;">
                     <div class="border rounded p-3" style="background:#f8f9fa; font-size:0.92rem; line-height:1.7;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small fw-bold text-secondary text-uppercase" style="letter-spacing:.05em;">IzvjeÅ¡taj</span>
+                            <span class="small fw-bold text-secondary text-uppercase" style="letter-spacing:.05em;">Izvještaj</span>
                             <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copyReport()" title="Kopiraj tekst">
                                 <i class="bi bi-clipboard"></i>
                             </button>
@@ -585,7 +585,7 @@ service firebase.storage {
 
 <script>
 /* =====================================================================
-   ===== KONFIGURACIJA â ZAMIJENI OVE VRIJEDNOSTI =====
+   ===== KONFIGURACIJA – ZAMIJENI OVE VRIJEDNOSTI =====
    ===================================================================== */
 
 const FIREBASE_CONFIG = {
@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = this.files[0];
             if (!file) return;
             if (file.size > MAX_PHOTO_BYTES) {
-                alert(`Slika ${idx} je prevelika. Maksimalna veliÄina je 2 MB.`);
+                alert(`Slika ${idx} je prevelika. Maksimalna veličina je 2 MB.`);
                 this.value = '';
                 return;
             }
@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshMarkerListeners(db);
     });
 
-    // DinamiÄki uÄitaj Google Maps
+    // Dinamički učitaj Google Maps
     window._initMap = () => initMap(db, auth);
     const s = document.createElement('script');
     s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=_initMap&loading=async&language=hr`;
@@ -713,7 +713,7 @@ function initMap(db, auth) {
 }
 
 // =====================================================================
-// FIRESTORE â real-time listener
+// FIRESTORE – real-time listener
 // =====================================================================
 function listenToTrees(db) {
     db.collection('trees').orderBy('dateAdded', 'desc').onSnapshot(snap => {
@@ -737,7 +737,7 @@ function listenToTrees(db) {
 // MARKERI
 // =====================================================================
 function getColor(status) {
-    return { evidentirano: '#dc2626', 'u postupku': '#d97706', 'Äeka panj': '#7c3aed', sanirano: '#16a34a' }[status] ?? '#6b7280';
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', 'čeka panj': '#7c3aed', sanirano: '#16a34a' }[status] ?? '#6b7280';
 }
 
 function addMarker(data, db) {
@@ -751,7 +751,7 @@ function addMarker(data, db) {
             strokeColor: '#fff', strokeWeight: 2,
             scale: 1.15, anchor: new google.maps.Point(0, 15)
         },
-        title: `#${data.id.slice(-4).toUpperCase()} â ${data.status}`
+        title: `#${data.id.slice(-4).toUpperCase()} – ${data.status}`
     });
 
     marker.addListener('click', () => {
@@ -773,9 +773,9 @@ function refreshMarkerListeners(db) {
 }
 
 function showInfo(data, marker) {
-    const mach  = data.machinery?.length ? data.machinery.join(', ') : 'â';
-    const stars = 'â'.repeat(data.complexity || 1) + 'â'.repeat(5 - (data.complexity || 1));
-    const photoLabels = ['PoÄetno stanje', 'Tijek radova', 'Nakon uklanjanja'];
+    const mach  = data.machinery?.length ? data.machinery.join(', ') : '–';
+    const stars = '★'.repeat(data.complexity || 1) + '☆'.repeat(5 - (data.complexity || 1));
+    const photoLabels = ['Početno stanje', 'Tijek radova', 'Nakon uklanjanja'];
     const photos = [data.photoUrl, data.photoUrl2, data.photoUrl3].filter(Boolean);
     const photoHtml = photos.length
         ? `<div style="display:flex;gap:5px;margin-bottom:8px;overflow-x:auto;padding-bottom:2px;">
@@ -795,10 +795,10 @@ function showInfo(data, marker) {
                 <span style="background:${getColor(data.status)};color:#fff;padding:2px 9px;border-radius:12px;font-size:0.72rem;font-weight:600;">${data.status}</span>
             </div>
             <div style="font-size:0.82rem;color:#444;display:grid;gap:3px;line-height:1.5;">
-                <div>ð ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}</div>
-                <div>â­ Kompleksnost: ${stars} (${data.complexity || 1}/5)</div>
-                <div>ð§ ${mach}</div>
-                ${data.notes ? `<div>ð ${data.notes}</div>` : ''}
+                <div>📍 ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}</div>
+                <div>⭐ Kompleksnost: ${stars} (${data.complexity || 1}/5)</div>
+                <div>🔧 ${mach}</div>
+                ${data.notes ? `<div>📝 ${data.notes}</div>` : ''}
                 <div style="color:#aaa;font-size:0.72rem;margin-top:3px;">Evidentirano: ${fmtDate(data.dateAdded)}</div>
             </div>
         </div>`);
@@ -884,7 +884,7 @@ async function saveTree() {
         }
         treeModalBS.hide();
     } catch (e) {
-        alert('GreÅ¡ka pri spremanju: ' + e.message);
+        alert('Greška pri spremanju: ' + e.message);
     } finally {
         saveBtn.disabled = false;
         saveBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Spremi';
@@ -893,9 +893,9 @@ async function saveTree() {
 
 async function deleteTree() {
     const id = document.getElementById('tree-id').value;
-    if (!id || !confirm('ObriÅ¡i ovo stablo?')) return;
+    if (!id || !confirm('Obriši ovo stablo?')) return;
     try {
-        // PokuÅ¡aj obrisati sve fotografije iz Storage-a
+        // Pokušaj obrisati sve fotografije iz Storage-a
         const urls = [1, 2, 3].map(i => document.getElementById(`tree-photo-url-${i}`).value).filter(Boolean);
         for (const url of urls) {
             try { await firebase.storage().refFromURL(url).delete(); } catch (_) {}
@@ -940,7 +940,7 @@ function openAddModal(lat, lng) {
     document.getElementById('tree-lat').value        = lat.toFixed(7);
     document.getElementById('tree-lng').value        = lng.toFixed(7);
     document.getElementById('tree-notes').value      = '';
-    document.getElementById('modal-title').textContent = 'Novo sruÅ¡eno stablo';
+    document.getElementById('modal-title').textContent = 'Novo srušeno stablo';
     document.getElementById('del-btn').style.display   = 'none';
     document.querySelector('input[name="st"][value="evidentirano"]').checked = true;
     document.querySelectorAll('input[name="mech"]').forEach(c => c.checked = false);
@@ -953,7 +953,7 @@ function openEditModal(data, db) {
     document.getElementById('tree-id').value         = data.id;
     document.getElementById('tree-old-status').value = data.status || '';
     document.getElementById('tree-lat').value        = data.lat.toFixed(7);
-    document.getElementById('tree-lng').value        = data.lng.toFixed(7);
+    document.getElementById('tree-lng').value     0  = data.lng.toFixed(7);
     document.getElementById('tree-notes').value = data.notes || '';
     document.getElementById('modal-title').textContent = 'Uredi stablo #' + data.id.slice(-4).toUpperCase();
     document.getElementById('del-btn').style.display   = 'inline-flex';
@@ -997,7 +997,7 @@ async function doLogin(auth) {
         await auth.signInWithEmailAndPassword(email, pass);
         loginModalBS.hide();
     } catch (e) {
-        err.textContent = 'PogreÅ¡an email ili lozinka.';
+        err.textContent = 'Pogrešan email ili lozinka.';
         err.classList.remove('d-none');
     }
 }
@@ -1036,9 +1036,9 @@ function renderPanel() {
     }
 
     list.innerHTML = trees.map(t => {
-        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : t.status === 'Äeka panj' ? 'cp' : 'sa';
+        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : t.status === 'čeka panj' ? 'cp' : 'sa';
         const mach  = t.machinery?.length ? t.machinery.join(', ') : '';
-        const stars = 'â'.repeat(t.complexity||1) + 'â'.repeat(5-(t.complexity||1));
+        const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
         const firstPhoto = t.photoUrl || t.photoUrl2 || t.photoUrl3;
         const thumb = firstPhoto
             ? `<img src="${firstPhoto}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #eee;flex-shrink:0;">`
@@ -1050,7 +1050,7 @@ function renderPanel() {
                     <div style="min-width:0;">
                         <div class="fw-semibold small">Stablo #${t.id.slice(-4).toUpperCase()}</div>
                         <div class="tree-id-label">${t.lat.toFixed(5)}, ${t.lng.toFixed(5)}</div>
-                        <div class="text-muted" style="font-size:0.75rem;">${stars}${mach ? ' Â· ' + mach : ''}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">${stars}${mach ? ' · ' + mach : ''}</div>
                     </div>
                 </div>
                 <span class="badge-${cls} flex-shrink-0">${t.status}</span>
@@ -1073,11 +1073,11 @@ function focusTree(id) {
 // STATISTIKE
 // =====================================================================
 function updateStats() {
-    const c = { evidentirano: 0, 'u postupku': 0, 'Äeka panj': 0, sanirano: 0 };
+    const c = { evidentirano: 0, 'u postupku': 0, 'čeka panj': 0, sanirano: 0 };
     allTrees.forEach(t => { if (c[t.status] !== undefined) c[t.status]++; });
     document.getElementById('cnt-ev').textContent = c['evidentirano'];
     document.getElementById('cnt-up').textContent = c['u postupku'];
-    document.getElementById('cnt-cp').textContent = c['Äeka panj'];
+    document.getElementById('cnt-cp').textContent = c['čeka panj'];
     document.getElementById('cnt-sa').textContent = c['sanirano'];
 }
 
@@ -1097,7 +1097,7 @@ function setComplexity(v) {
 // =====================================================================
 function exportCSV() {
     if (!allTrees.length) { alert('Nema podataka za izvoz.'); return; }
-    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Slika 1 (poÄetno)','Slika 2 (tijek)','Slika 3 (zavrÅ¡no)','Datum evidencije','Datum izmjene'];
+    const hdr = ['ID','Lat','Lng','Status','Kompleksnost','Mehanizacija','Napomene','Slika 1 (početno)','Slika 2 (tijek)','Slika 3 (završno)','Datum evidencije','Datum izmjene'];
     const rows = allTrees.map(t => [
         t.id,
         t.lat.toFixed(7),
@@ -1121,16 +1121,16 @@ function exportCSV() {
 }
 
 // =====================================================================
-// POMOÄNE FUNKCIJE
+// POMOĆNE FUNKCIJE
 // =====================================================================
 function fmtDate(ts) {
-    if (!ts) return 'â';
+    if (!ts) return '–';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
     return d.toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
 // =====================================================================
-// IZVJEÅ TAJ O NAPRETKU
+// IZVJEŠTAJ O NAPRETKU
 // =====================================================================
 function openReportModal() {
     // Postavi zadani period: zadnjih 7 dana
@@ -1175,7 +1175,7 @@ function generateReport() {
     // Analiza podataka
     const total     = allTrees.length;
     const sanirano  = allTrees.filter(t => t.status === 'sanirano').length;
-    const cekaPanj  = allTrees.filter(t => t.status === 'Äeka panj').length;
+    const cekaPanj  = allTrees.filter(t => t.status === 'čeka panj').length;
     const uPostupku = allTrees.filter(t => t.status === 'u postupku').length;
     const evid      = allTrees.filter(t => t.status === 'evidentirano').length;
 
@@ -1220,7 +1220,7 @@ function generateReport() {
         .slice(0, 3)
         .map(([m]) => m);
 
-    // ProsjeÄna sloÅ¾enost preostalih stabala
+    // Prosječna složenost preostalih stabala
     const avgComplexity = remaining.length
         ? remaining.reduce((s, t) => s + (t.complexity || 1), 0) / remaining.length
         : 0;
@@ -1238,7 +1238,7 @@ function generateReport() {
         topMach, avgComplexity, remaining: remaining.length
     });
 
-    // PrikaÅ¾i statistike (ponderirani izraÄun: sanirano=100%, Äeka panj=90%, u postupku=10%)
+    // Prikaži statistike (ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%)
     const weightedDone = sanirano * 1.0 + cekaPanj * 0.90 + uPostupku * 0.10;
     const pct = Math.round((weightedDone / total) * 100);
     document.getElementById('report-stats').innerHTML = `
@@ -1252,7 +1252,7 @@ function generateReport() {
         </div></div>
         <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold" style="font-size:1.3rem;color:#7c3aed;">${cekaPanj}</div>
-            <div class="text-muted" style="font-size:0.72rem;">Äeka panj</div>
+            <div class="text-muted" style="font-size:0.72rem;">Čeka panj</div>
         </div></div>
         <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-success" style="font-size:1.3rem;">${sanirano}</div>
@@ -1260,12 +1260,12 @@ function generateReport() {
         </div></div>
         <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-primary" style="font-size:1.3rem;">${pct}%</div>
-            <div class="text-muted" style="font-size:0.72rem;">DovrÅ¡enost</div>
+            <div class="text-muted" style="font-size:0.72rem;">Dovršenost</div>
         </div></div>
     `;
 
     document.getElementById('report-text').innerHTML = reportText
-        .split(/(?<=[a-zÄÄÅ¡ÄÅ¾A-ZÄÄÅ ÄÅ½])\. /)
+        .split(/(?<=[a-zčćšđžA-ZČĆŠĐŽ])\. /)
         .filter(Boolean)
         .map(s => `<p class="mb-1">${s.trim()}${s.trim().endsWith('.') ? '' : '.'}</p>`)
         .join('');
@@ -1278,17 +1278,17 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
     newInPeriod, statusChangesInPeriod, completedInPeriod, topMach, avgComplexity, remaining }) {
 
     const fmtD = s => new Date(s + 'T00:00:00').toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric' });
-    // Ponderirani izraÄun: sanirano=100%, Äeka panj=90%, u postupku=10%
+    // Ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%
     const weightedDone = sanirano * 1.0 + cekaPanj * 0.90 + uPostupku * 0.10;
     const pct  = Math.round((weightedDone / total) * 100);
     const sentences = [];
 
     // 1. Uvod: period i ukupni pregled
     const periodLabel = fromStr === '2020-01-01'
-        ? 'Od poÄetka evidencije'
+        ? 'Od početka evidencije'
         : `U periodu od ${fmtD(fromStr)} do ${fmtD(toStr)}`;
     sentences.push(
-        `${periodLabel} evidentirano je ukupno ${total} sruÅ¡enih stabala na groblju Mirogoj, od Äega ${sanirano} sanirano, ${cekaPanj > 0 ? `${cekaPanj} Äeka vaÄenje panja, ` : ''}${uPostupku} u postupku sanacije, a ${evid} Äeka intervenciju.`
+        `${periodLabel} evidentirano je ukupno ${total} srušenih stabala na groblju Mirogoj, od čega ${sanirano} sanirano, ${cekaPanj > 0 ? `${cekaPanj} čeka vađenje panja, ` : ''}${uPostupku} u postupku sanacije, a ${evid} čeka intervenciju.`
     );
 
     // 2. Aktivnost u periodu
@@ -1299,47 +1299,47 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
         if (completedInPeriod > 0)
             dijelovi.push(`sanirana ${completedInPeriod} ${completedInPeriod === 1 ? 'lokacija' : completedInPeriod < 5 ? 'lokacije' : 'lokacija'}`);
         if (statusChangesInPeriod > completedInPeriod + (newInPeriod > 0 ? 1 : 0))
-            dijelovi.push(`zabiljeÅ¾ene ${statusChangesInPeriod} promjene statusa`);
+            dijelovi.push(`zabilježene ${statusChangesInPeriod} promjene statusa`);
         sentences.push(`U navedenom periodu ${dijelovi.join(', ')}.`);
     } else {
-        sentences.push(`U navedenom periodu nije zabiljeÅ¾ena aktivnost promjene statusa stabala.`);
+        sentences.push(`U navedenom periodu nije zabilježena aktivnost promjene statusa stabala.`);
     }
 
     // 3. Potrebna mehanizacija
     if (topMach.length > 0) {
         sentences.push(
-            `Za sanaciju preostalih ${remaining} stabala najÄeÅ¡Äe je potrebno: ${topMach.join(', ')}.`
+            `Za sanaciju preostalih ${remaining} stabala najčešće je potrebno: ${topMach.join(', ')}.`
         );
     } else if (remaining > 0) {
         sentences.push(`Za sanaciju preostalih ${remaining} stabala nije specificirana mehanizacija.`);
     }
 
-    // 4. ProsjeÄna sloÅ¾enost
+    // 4. Prosječna složenost
     if (remaining > 0 && avgComplexity > 0) {
         const avgRound = Math.round(avgComplexity * 10) / 10;
         const label = avgComplexity < 2 ? 'niske razine zahtjevnosti'
-                    : avgComplexity < 3 ? 'umjerene zahtjevnosti'
-                    : avgComplexity < 4 ? 'srednje sloÅ¾enosti'
-                    : 'visoke sloÅ¾enosti';
-        sentences.push(`ProsjeÄna sloÅ¾enost preostalih radova iznosi ${avgRound.toFixed(1)}/5 (${label}).`);
+     0              : avgComplexity < 3 ? 'umjerene zahtjevnosti'
+                    : avgComplexity < 4 ? 'srednje složenosti'
+                    : 'visoke složenosti';
+        sentences.push(`Prosječna složenost preostalih radova iznosi ${avgRound.toFixed(1)}/5 (${label}).`);
     }
 
     // 5. Ukupni napredak
     sentences.push(
-        `Ponderirani postotak dovrÅ¡enosti sanacije iznosi ${pct}% (potpuno sanirano: ${sanirano}, Äeka panj: ${cekaPanj}Ã90%, u postupku: ${uPostupku}Ã10%).`
+        `Ponderirani postotak dovršenosti sanacije iznosi ${pct}% (potpuno sanirano: ${sanirano}, čeka panj: ${cekaPanj}×90%, u postupku: ${uPostupku}×10%).`
     );
 
-    // 6. ZakljuÄna reÄenica
+    // 6. Zaključna rečenica
     if (pct >= 100) {
-        sentences.push('Sva evidentirana stabla su uspjeÅ¡no sanirana.');
+        sentences.push('Sva evidentirana stabla su uspješno sanirana.');
     } else if (pct >= 75) {
-        sentences.push('Sanacija se bliÅ¾i zavrÅ¡etku â preporuÄa se nastaviti intenzivnim tempom radova.');
+        sentences.push('Sanacija se bliži završetku – preporuča se nastaviti intenzivnim tempom radova.');
     } else if (pct >= 50) {
-        sentences.push('Dostignut je znatan napredak; preporuÄa se nastaviti planiranim tempom sanacije.');
+        sentences.push('Dostignut je znatan napredak; preporuča se nastaviti planiranim tempom sanacije.');
     } else if (pct >= 25) {
-        sentences.push('Radovi su u tijeku; preporuÄa se ubrzati sanaciju visokoriziÄnih stabala s oznakom "Evidentirano".');
+        sentences.push('Radovi su u tijeku; preporuča se ubrzati sanaciju visokorizičnih stabala s oznakom "Evidentirano".');
     } else {
-        sentences.push('Sanacija je u poÄetnoj fazi; preporuÄa se prioritizirati stabla visoke riziÄnosti i zahtjevnosti.');
+        sentences.push('Sanacija je u početnoj fazi; preporuča se prioritizirati stabla visoke rizičnosti i zahtjevnosti.');
     }
 
     return sentences.join(' ');
