@@ -494,7 +494,7 @@ service firebase.storage {
                         <input type="file" class="form-control form-control-sm" id="tree-photo-file-3" accept="image/*">
                         <div id="upload-progress-bar-3" style="display:none;margin-top:4px;height:4px;background:#e9ecef;border-radius:2px;">
                             <div id="upload-progress-3" style="width:0%;height:100%;background:#143058;border-radius:2px;transition:width 0.2s;"></div>
-         !              </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -953,7 +953,7 @@ function openEditModal(data, db) {
     document.getElementById('tree-id').value         = data.id;
     document.getElementById('tree-old-status').value = data.status || '';
     document.getElementById('tree-lat').value        = data.lat.toFixed(7);
-    document.getElementById('tree-lng').value     0  = data.lng.toFixed(7);
+    document.getElementById('tree-lng').value        = data.lng.toFixed(7);
     document.getElementById('tree-notes').value = data.notes || '';
     document.getElementById('modal-title').textContent = 'Uredi stablo #' + data.id.slice(-4).toUpperCase();
     document.getElementById('del-btn').style.display   = 'inline-flex';
@@ -1238,9 +1238,8 @@ function generateReport() {
         topMach, avgComplexity, remaining: remaining.length
     });
 
-    // Prikaži statistike (ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%)
-    const weightedDone = sanirano * 1.0 + cekaPanj * 0.90 + uPostupku * 0.10;
-    const pct = Math.round((weightedDone / total) * 100);
+    // Prikaži statistike
+    const pct = Math.round((sanirano / total) * 100);
     document.getElementById('report-stats').innerHTML = `
         <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-danger" style="font-size:1.3rem;">${evid}</div>
@@ -1278,9 +1277,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
     newInPeriod, statusChangesInPeriod, completedInPeriod, topMach, avgComplexity, remaining }) {
 
     const fmtD = s => new Date(s + 'T00:00:00').toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric' });
-    // Ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%
-    const weightedDone = sanirano * 1.0 + cekaPanj * 0.90 + uPostupku * 0.10;
-    const pct  = Math.round((weightedDone / total) * 100);
+    const pct  = Math.round((sanirano / total) * 100);
     const sentences = [];
 
     // 1. Uvod: period i ukupni pregled
@@ -1318,7 +1315,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
     if (remaining > 0 && avgComplexity > 0) {
         const avgRound = Math.round(avgComplexity * 10) / 10;
         const label = avgComplexity < 2 ? 'niske razine zahtjevnosti'
-     0              : avgComplexity < 3 ? 'umjerene zahtjevnosti'
+                    : avgComplexity < 3 ? 'umjerene zahtjevnosti'
                     : avgComplexity < 4 ? 'srednje složenosti'
                     : 'visoke složenosti';
         sentences.push(`Prosječna složenost preostalih radova iznosi ${avgRound.toFixed(1)}/5 (${label}).`);
@@ -1326,7 +1323,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
 
     // 5. Ukupni napredak
     sentences.push(
-        `Ponderirani postotak dovršenosti sanacije iznosi ${pct}% (potpuno sanirano: ${sanirano}, čeka panj: ${cekaPanj}×90%, u postupku: ${uPostupku}×10%).`
+        `Ukupna dovršenost sanacije iznosi ${pct}% (${sanirano} od ${total} evidentiranih stabala).`
     );
 
     // 6. Zaključna rečenica
@@ -1337,7 +1334,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
     } else if (pct >= 50) {
         sentences.push('Dostignut je znatan napredak; preporuča se nastaviti planiranim tempom sanacije.');
     } else if (pct >= 25) {
-        sentences.push('Radovi su u tijeku; preporuča se ubrzati sanaciju visokorizičnih stabala s oznakom "Evidentirano".');
+        sentences.push('Radovi su u tijeku; preporuča se ubrzati sanaciju visokorizečnih stabala s oznakom "Evidentirano".');
     } else {
         sentences.push('Sanacija je u početnoj fazi; preporuča se prioritizirati stabla visoke rizičnosti i zahtjevnosti.');
     }
