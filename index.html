@@ -602,7 +602,46 @@ const GOOGLE_MAPS_API_KEY = "AIzaSyDwqVmd-9UrT3Kg_6sCtNR6WWXwfZcv-Qg";
 /* ===================================================================== */
 
 const IS_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('FIREBASE_'))
-                   this.files[0];
+                      && GOOGLE_MAPS_API_KEY !== "GOOGLE_MAPS_API_KEY";
+
+// ---- Globalno stanje ----
+let map, infoWindow;
+let markers    = {};
+let allTrees   = [];
+let isLoggedIn = false;
+let currentFilter = 'all';
+let treeModalBS, loginModalBS, reportModalBS;
+
+const MIROGOJ = { lat: 45.835926, lng: 15.984933 };
+const COMPLEXITY_LABELS = ['','Jednostavno','Lagano','Srednje','Zahtjevno','Vrlo zahtjevno'];
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
+
+// =====================================================================
+// INICIJALIZACIJA
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    if (!IS_CONFIGURED) {
+        document.getElementById('setup-banner').style.display = 'flex';
+        return;
+    }
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    treeModalBS   = new bootstrap.Modal(document.getElementById('treeModal'));
+    loginModalBS  = new bootstrap.Modal(document.getElementById('loginModal'));
+    reportModalBS = new bootstrap.Modal(document.getElementById('reportModal'));
+
+    // Enter u polju lozinke
+    document.getElementById('inp-pass').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doLogin(auth);
+    });
+
+    // Preview slike pri odabiru (sva 3 slota)
+    [1, 2, 3].forEach(idx => {
+        document.getElementById(`tree-photo-file-${idx}`).addEventListener('change', function() {
+            const file = this.files[0];
             if (!file) return;
             if (file.size > MAX_PHOTO_BYTES) {
                 alert(`Slika ${idx} je prevelika. Maksimalna veličina je 2 MB.`);
@@ -809,36 +848,7 @@ async function saveTree() {
                 await new Promise((resolve, reject) => {
                     uploadTask.on('state_changed',
                         snap => { progressBar.style.width = Math.round((snap.bytesTransferred / snap.totalBytes) * 100) + '%'; },
-     [...document.querySelectorAll('input[name="mech"]:checked')].map(c => c.value);
-
-    const saveBtn = document.getElementById('save-btn');
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sprema...';
-
-    try {
-        const docId = id || db.collection('trees').doc().id;
-        // Suffixes za Storage: slot 1 = '', slot 2 = '-2', slot 3 = '-3'
-        const suffixes = ['', '-2', '-3'];
-        const photoUrls = [];
-
-        for (let i = 0; i < 3; i++) {
-            const idx  = i + 1;
-            const file = document.getElementById(`tree-photo-file-${idx}`).files[0];
-            const existing = document.getElementById(`tree-photo-url-${idx}`).value;
-
-            if (file) {
-                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-                const path = `trees/${docId}${suffixes[i]}.${ext}`;
-                const ref  = storage.ref(path);
-                const progressWrap = document.getElementById(`upload-progress-bar-${idx}`);
-                const progressBar  = document.getElementById(`upload-progress-${idx}`);
-                progressWrap.style.display = 'block';
-
-                const uploadTask = ref.put(file, { contentType: file.type });
-                await new Promise((resolve, reject) => {
-                    uploadTask.on('state_changed',
-                        snap => { progressBar.style.width = Math.round((snap.bytesTransferred / snap.totalBytes) * 100) + '%'; },
-    2                   reject, resolve
+                        reject, resolve
                     );
                 });
                 photoUrls.push(await ref.getDownloadURL());
