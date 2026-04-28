@@ -47,6 +47,7 @@
         .stat-pill.up { background: #fef3c7; color: #b45309; }
         .stat-pill.sa { background: #dcfce7; color: #15803d; }
         .stat-pill.cp { background: #f3e8ff; color: #7c3aed; }
+        .stat-pill.dz { background: #fff7ed; color: #c2410c; }
 
         /* ---- FILTER BAR (left) ---- */
         #filter-bar {
@@ -102,6 +103,7 @@
         .badge-up { background: #fef3c7; color: #b45309; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
         .badge-sa { background: #dcfce7; color: #15803d; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
         .badge-cp { background: #f3e8ff; color: #7c3aed; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+        .badge-dz { background: #fff7ed; color: #c2410c; padding: 2px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
 
         /* ---- MODE INDICATOR ---- */
         #mode-indicator {
@@ -126,6 +128,7 @@
         .up-label { background: #fef3c7; color: #b45309; }
         .sa-label { background: #dcfce7; color: #15803d; }
         .cp-label { background: #f3e8ff; color: #7c3aed; }
+        .dz-label { background: #fff7ed; color: #c2410c; }
         .status-option input:checked + .status-label { border-color: currentColor; box-shadow: 0 0 0 2px rgba(0,0,0,0.08); }
 
         /* ---- STAR RATING ---- */
@@ -272,6 +275,7 @@ service firebase.storage {
     <div class="stat-pill ev"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-ev">0</span> Evidentirano</div>
     <div class="stat-pill up"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-up">0</span> U postupku</div>
     <div class="stat-pill cp"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-cp">0</span> Čeka panj</div>
+    <div class="stat-pill dz"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-dz">0</span> Dizalica 40t</div>
     <div class="stat-pill sa"><i class="bi bi-circle-fill" style="font-size:0.55rem"></i> <span id="cnt-sa">0</span> Sanirano</div>
 </div>
 
@@ -281,6 +285,7 @@ service firebase.storage {
     <button class="filter-btn" onclick="setFilter('evidentirano',this)"><span style="color:#dc2626">●</span> Evidentirano</button>
     <button class="filter-btn" onclick="setFilter('u postupku',this)"><span style="color:#b45309">●</span> U postupku</button>
     <button class="filter-btn" onclick="setFilter('čeka panj',this)"><span style="color:#7c3aed">●</span> Čeka panj</button>
+    <button class="filter-btn" onclick="setFilter('dizalica 40t',this)"><span style="color:#c2410c">●</span> Dizalica 40t</button>
     <button class="filter-btn" onclick="setFilter('sanirano',this)"><span style="color:#15803d">●</span> Sanirano</button>
 </div>
 
@@ -304,6 +309,7 @@ service firebase.storage {
             <option value="evidentirano">Evidentirano</option>
             <option value="u postupku">U postupku</option>
             <option value="čeka panj">Čeka panj</option>
+            <option value="dizalica 40t">Dizalica 40t</option>
             <option value="sanirano">Sanirano</option>
         </select>
     </div>
@@ -385,6 +391,10 @@ service firebase.storage {
                         <label class="status-option">
                             <input type="radio" name="st" value="čeka panj">
                             <span class="status-label cp-label">● Čeka panj</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="st" value="dizalica 40t">
+                            <span class="status-label dz-label">● Dizalica 40t</span>
                         </label>
                         <label class="status-option">
                             <input type="radio" name="st" value="sanirano">
@@ -577,7 +587,7 @@ service firebase.storage {
 <!-- ===================== SCRIPTS ===================== -->
 <!-- Firebase Compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="https://www.gswatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
 <!-- Bootstrap JS -->
@@ -737,7 +747,7 @@ function listenToTrees(db) {
 // MARKERI
 // =====================================================================
 function getColor(status) {
-    return { evidentirano: '#dc2626', 'u postupku': '#d97706', 'čeka panj': '#7c3aed', sanirano: '#16a34a' }[status] ?? '#6b7280';
+    return { evidentirano: '#dc2626', 'u postupku': '#d97706', 'čeka panj': '#7c3aed', 'dizalica 40t': '#c2410c', sanirano: '#16a34a' }[status] ?? '#6b7280';
 }
 
 function addMarker(data, db) {
@@ -1036,7 +1046,7 @@ function renderPanel() {
     }
 
     list.innerHTML = trees.map(t => {
-        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : t.status === 'čeka panj' ? 'cp' : 'sa';
+        const cls   = t.status === 'evidentirano' ? 'ev' : t.status === 'u postupku' ? 'up' : t.status === 'čeka panj' ? 'cp' : t.status === 'dizalica 40t' ? 'dz' : 'sa';
         const mach  = t.machinery?.length ? t.machinery.join(', ') : '';
         const stars = '★'.repeat(t.complexity||1) + '☆'.repeat(5-(t.complexity||1));
         const firstPhoto = t.photoUrl || t.photoUrl2 || t.photoUrl3;
@@ -1073,11 +1083,12 @@ function focusTree(id) {
 // STATISTIKE
 // =====================================================================
 function updateStats() {
-    const c = { evidentirano: 0, 'u postupku': 0, 'čeka panj': 0, sanirano: 0 };
+    const c = { evidentirano: 0, 'u postupku': 0, 'čeka panj': 0, 'dizalica 40t': 0, sanirano: 0 };
     allTrees.forEach(t => { if (c[t.status] !== undefined) c[t.status]++; });
     document.getElementById('cnt-ev').textContent = c['evidentirano'];
     document.getElementById('cnt-up').textContent = c['u postupku'];
     document.getElementById('cnt-cp').textContent = c['čeka panj'];
+    document.getElementById('cnt-dz').textContent = c['dizalica 40t'];
     document.getElementById('cnt-sa').textContent = c['sanirano'];
 }
 
@@ -1173,11 +1184,12 @@ function generateReport() {
     const toDate   = new Date(toStr   + 'T23:59:59');
 
     // Analiza podataka
-    const total     = allTrees.length;
-    const sanirano  = allTrees.filter(t => t.status === 'sanirano').length;
-    const cekaPanj  = allTrees.filter(t => t.status === 'čeka panj').length;
-    const uPostupku = allTrees.filter(t => t.status === 'u postupku').length;
-    const evid      = allTrees.filter(t => t.status === 'evidentirano').length;
+    const total       = allTrees.length;
+    const sanirano    = allTrees.filter(t => t.status === 'sanirano').length;
+    const cekaPanj    = allTrees.filter(t => t.status === 'čeka panj').length;
+    const uPostupku   = allTrees.filter(t => t.status === 'u postupku').length;
+    const dizalica40t = allTrees.filter(t => t.status === 'dizalica 40t').length;
+    const evid        = allTrees.filter(t => t.status === 'evidentirano').length;
 
     // Stabla dodana u periodu
     const newInPeriod = allTrees.filter(t => {
@@ -1233,12 +1245,12 @@ function generateReport() {
 
     const reportText = buildReportText({
         fromDate, toDate, fromStr, toStr,
-        total, sanirano, cekaPanj, uPostupku, evid,
+        total, sanirano, cekaPanj, uPostupku, dizalica40t, evid,
         newInPeriod, statusChangesInPeriod, completedInPeriod,
         topMach, avgComplexity, remaining: remaining.length
     });
 
-    // Prikaži statistike (ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%)
+    // Prikaži statistike (ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%, dizalica 40t=0%)
     const weightedDone = sanirano * 1.0 + cekaPanj * 0.90 + uPostupku * 0.10;
     const pct = Math.round((weightedDone / total) * 100);
     document.getElementById('report-stats').innerHTML = `
@@ -1253,6 +1265,10 @@ function generateReport() {
         <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold" style="font-size:1.3rem;color:#7c3aed;">${cekaPanj}</div>
             <div class="text-muted" style="font-size:0.72rem;">Čeka panj</div>
+        </div></div>
+        <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
+            <div class="fw-bold" style="font-size:1.3rem;color:#c2410c;">${dizalica40t}</div>
+            <div class="text-muted" style="font-size:0.72rem;">Dizalica 40t</div>
         </div></div>
         <div class="col-6 col-sm"><div class="border rounded p-2 text-center" style="background:#fff;">
             <div class="fw-bold text-success" style="font-size:1.3rem;">${sanirano}</div>
@@ -1274,11 +1290,11 @@ function generateReport() {
     document.getElementById('report-output').style.display  = 'block';
 }
 
-function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, cekaPanj, uPostupku, evid,
+function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, cekaPanj, uPostupku, dizalica40t, evid,
     newInPeriod, statusChangesInPeriod, completedInPeriod, topMach, avgComplexity, remaining }) {
 
     const fmtD = s => new Date(s + 'T00:00:00').toLocaleDateString('hr-HR', { day:'2-digit', month:'2-digit', year:'numeric' });
-    // Ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%
+    // Ponderirani izračun: sanirano=100%, čeka panj=90%, u postupku=10%, dizalica 40t=0%
     const weightedDone = sanirano * 1.0 + cekaPanj * 0.90 + uPostupku * 0.10;
     const pct  = Math.round((weightedDone / total) * 100);
     const sentences = [];
@@ -1288,7 +1304,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
         ? 'Od početka evidencije'
         : `U periodu od ${fmtD(fromStr)} do ${fmtD(toStr)}`;
     sentences.push(
-        `${periodLabel} evidentirano je ukupno ${total} srušenih stabala na groblju Mirogoj, od čega ${sanirano} sanirano, ${cekaPanj > 0 ? `${cekaPanj} čeka vađenje panja, ` : ''}${uPostupku} u postupku sanacije, a ${evid} čeka intervenciju.`
+        `${periodLabel} evidentirano je ukupno ${total} srušenih stabala na groblju Mirogoj, od čega ${sanirano} sanirano, ${cekaPanj > 0 ? `${cekaPanj} čeka vađenje panja, ` : ''}${dizalica40t > 0 ? `${dizalica40t} čeka dizalicu 40t, ` : ''}${uPostupku} u postupku sanacije, a ${evid} čeka intervenciju.`
     );
 
     // 2. Aktivnost u periodu
@@ -1326,7 +1342,7 @@ function buildReportText({ fromDate, toDate, fromStr, toStr, total, sanirano, ce
 
     // 5. Ukupni napredak
     sentences.push(
-        `Ponderirani postotak dovršenosti sanacije iznosi ${pct}% (potpuno sanirano: ${sanirano}, čeka panj: ${cekaPanj}×90%, u postupku: ${uPostupku}×10%).`
+        `Ponderirani postotak dovršenosti sanacije iznosi ${pct}% (potpuno sanirano: ${sanirano}, čeka panj: ${cekaPanj}×90%, u postupku: ${uPostupku}×10%, dizalica 40t: ${dizalica40t}×0%).`
     );
 
     // 6. Zaključna rečenica
